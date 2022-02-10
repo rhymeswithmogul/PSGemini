@@ -1,14 +1,14 @@
 ---
 external help file: PSGemini-help.xml
 Module Name: PSGemini
-online version:
+online version: https://github.com/rhymeswithmogul/PSGemini/blob/main/man/en-US/Remove-PSGeminiKnownCertificate.md
 schema: 2.0.0
 ---
 
 # Remove-PSGeminiKnownCertificate
 
 ## SYNOPSIS
-{{ Fill in the Synopsis }}
+Removes a certificate from PSGemini's internal store.
 
 ## SYNTAX
 
@@ -23,21 +23,30 @@ Remove-PSGeminiKnownCertificate -Fingerprint <String> [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-{{ Fill in the Description }}
+This cmdlet will remove a certificate, indicated by either the host name or the fingerprint, from PSGemini's internal store.
+
+This cmdlet is meant to be used internally by Invoke-GeminiRequest, but regular users may (or may not) find a use for it.
 
 ## EXAMPLES
 
 ### Example 1
 ```powershell
-PS C:\> {{ Add example code here }}
+PS C:\> Remove-PSGeminiKnownCertificate -HostName gemini.circumlunar.space
 ```
 
-{{ Add example description here }}
+Removes gemini.circumlunar.space's certificate from the store.  The next time `Invoke-GeminiRequest` is run, it will implicitly trust any certificate it is presented.
+
+### Example 2
+```powershell
+PS C:\> Remove-PSGeminiKnownCertificate -Fingerprint '04A89008021E8F7AD7C73498D9147CC1D1122858FDB02DE0D50F82491F8CAF7CD525A2B410A20871A6AC7DB75AF7A1CE04C2F6628378108F8D6AB38EB8748D79BD'
+```
+
+Removes that specific certificate from the store.  The next time that the user runs `Invoke-GeminiRequest`, it will implicitly trust any certificate that the server presents.
 
 ## PARAMETERS
 
 ### -Fingerprint
-{{ Fill Fingerprint Description }}
+The fingerprint of a certificate present in the store.  The exact format of the fingerprint is left to the PowerShell runtime.  You must match whichever format that it stores.
 
 ```yaml
 Type: String
@@ -52,7 +61,8 @@ Accept wildcard characters: False
 ```
 
 ### -HostName
-{{ Fill HostName Description }}
+The hostname of a certificate.  This will match only the legacy Subject (CN=...) field, ignoring the SAN (subjectAltName) values, as the Gemini specification, as written, only checks the fingerprint and the expiration date.
+
 
 ```yaml
 Type: String
@@ -72,9 +82,18 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 ## INPUTS
 
 ### None
+This cmdlet does not accept pipeline input.
+
 ## OUTPUTS
 
 ### System.Void
+This cmdlet does not generate output.
+
 ## NOTES
+The PSGemini certificate store is saved in ~/.PSGemini_known_hosts.csv.  You may override this by setting the `$env:PSGeminiTOFUPath` variable.
 
 ## RELATED LINKS
+
+[Add-PSGeminiKnownCertificate]()
+[Get-PSGeminiKnownCertificates]()
+[Invoke-GeminiRequest]()

@@ -1,0 +1,636 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<helpItems schema="maml" xmlns="http://msh">
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+    <command:details>
+      <command:name>Add-PSGeminiKnownCertificate</command:name>
+      <command:verb>Add</command:verb>
+      <command:noun>PSGeminiKnownCertificate</command:noun>
+      <maml:description>
+        <maml:para>Adds an SSL certificate to the PSGemini certificate store.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>This cmdlet will manually add the given certificate to the PSGemini certificate store.</maml:para>
+      <maml:para>This cmdlet is meant to be used internally by the PSGemini module.  Still, there might be a reason why you want to run it (e.g., high security connections).</maml:para>
+    </maml:description>
+    <command:syntax>
+      <command:syntaxItem>
+        <maml:name>Add-PSGeminiKnownCertificate</maml:name>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="0" aliases="none">
+          <maml:name>HostName</maml:name>
+          <maml:description>
+            <maml:para>The host name (i.e., Subject) field of the certificate, minus qualifiers such as "CN=".  The Gemini protocol does not check the SAN (subjectAltName) field.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
+          <maml:name>Fingerprint</maml:name>
+          <maml:description>
+            <maml:para>The full fingerprint of the certificate.  The exact format of this parameter is left up to the PowerShell runtime to decide.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="NotAfter, ExpiryDate">
+          <maml:name>ExpirationDate</maml:name>
+          <maml:description>
+            <maml:para>The NotAfter date from the certificate.  Specify this as a `[DateTime]` object, or let PowerShell do the conversion for you.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">DateTime</command:parameterValue>
+          <dev:type>
+            <maml:name>DateTime</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="NotAfter, ExpiryDate">
+        <maml:name>ExpirationDate</maml:name>
+        <maml:description>
+          <maml:para>The NotAfter date from the certificate.  Specify this as a `[DateTime]` object, or let PowerShell do the conversion for you.</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">DateTime</command:parameterValue>
+        <dev:type>
+          <maml:name>DateTime</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
+        <maml:name>Fingerprint</maml:name>
+        <maml:description>
+          <maml:para>The full fingerprint of the certificate.  The exact format of this parameter is left up to the PowerShell runtime to decide.</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="0" aliases="none">
+        <maml:name>HostName</maml:name>
+        <maml:description>
+          <maml:para>The host name (i.e., Subject) field of the certificate, minus qualifiers such as "CN=".  The Gemini protocol does not check the SAN (subjectAltName) field.</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+    </command:parameters>
+    <command:inputTypes>
+      <command:inputType>
+        <dev:type>
+          <maml:name>None</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para>This cmdlet does not accept pipeline input.</maml:para>
+        </maml:description>
+      </command:inputType>
+    </command:inputTypes>
+    <command:returnValues>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>System.Void</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para>This cmdlet does not generate any output.</maml:para>
+        </maml:description>
+      </command:returnValue>
+    </command:returnValues>
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para>The PSGemini certificate store is saved in ~/.PSGemini_known_hosts.csv.  You may override this by setting the `$env:PSGeminiTOFUPath` variable.</maml:para>
+        <maml:para>This cmdlet is supposed to be run internally.  Calling this cmdlet manually is STRONGLY DISCOURAGED.</maml:para>
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples>
+      <command:example>
+        <maml:title>-------------------------- Example 1 --------------------------</maml:title>
+        <dev:code>PS C:\&gt; Add-PSGeminiKnownCertificate -HostName gemini.circumlunar.space -Fingerprint 04A89008021E8F7AD7C73498D9147CC1D1122858FDB02DE0D50F82491F8CAF7CD525A2B410A20871A6AC7DB75AF7A1CE04C2F6628378108F8D6AB38EB8748D79BD -ExpirationDate (Get-Date 10/03/2025 09:50:37)</dev:code>
+        <dev:remarks>
+          <maml:para>Manually adds a certificate to the store.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+    <command:relatedLinks>
+      <maml:navigationLink>
+        <maml:linkText>Online Version:</maml:linkText>
+        <maml:uri>https://github.com/rhymeswithmogul/PSGemini/blob/main/man/en-US/Add-PSGeminiKnownCertificate.md</maml:uri>
+      </maml:navigationLink>
+      <maml:navigationLink>
+        <maml:linkText>Get-PSGeminiKnownCertificates</maml:linkText>
+        <maml:uri></maml:uri>
+      </maml:navigationLink>
+      <maml:navigationLink>
+        <maml:linkText>Remove-PSGeminiKnownCertificate</maml:linkText>
+        <maml:uri></maml:uri>
+      </maml:navigationLink>
+      <maml:navigationLink>
+        <maml:linkText>Invoke-GeminiRequest</maml:linkText>
+        <maml:uri></maml:uri>
+      </maml:navigationLink>
+    </command:relatedLinks>
+  </command:command>
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+    <command:details>
+      <command:name>Get-PSGeminiKnownCertificates</command:name>
+      <command:verb>Get</command:verb>
+      <command:noun>PSGeminiKnownCertificates</command:noun>
+      <maml:description>
+        <maml:para>Fetches one or more certificates from the PSGemini internal store.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>This cmdlet will search PSGemini's certificate store (see Notes) and return any and all certificates matching the given host name.  If no host name is provided, all certificates will be returned.</maml:para>
+      <maml:para>Certificates are kept in the store until they are expired, at which point, they will be removed by subsequent calls to `Invoke-GeminiRequest`.</maml:para>
+    </maml:description>
+    <command:syntax>
+      <command:syntaxItem>
+        <maml:name>Get-PSGeminiKnownCertificates</maml:name>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="0" aliases="none">
+          <maml:name>HostName</maml:name>
+          <maml:description>
+            <maml:para>A host name.  If not provided, all certificates will be matched.  However, this parameter does not accept wildcards or [RegEx]s.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="0" aliases="none">
+        <maml:name>HostName</maml:name>
+        <maml:description>
+          <maml:para>A host name.  If not provided, all certificates will be matched.  However, this parameter does not accept wildcards or [RegEx]s.</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+    </command:parameters>
+    <command:inputTypes>
+      <command:inputType>
+        <dev:type>
+          <maml:name>None</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para>This cmdlet does not accept pipeline input.</maml:para>
+        </maml:description>
+      </command:inputType>
+    </command:inputTypes>
+    <command:returnValues>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>System.Management.Automation.PSObject[]</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para>A `PSCustomObject` showing the saved certificate information: the host name (the subject), the fingerprint, and the expiration date.</maml:para>
+        </maml:description>
+      </command:returnValue>
+    </command:returnValues>
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para>The PSGemini certificate store is saved in ~/.PSGemini_known_hosts.csv.  You may override this by setting the `$env:PSGeminiTOFUPath` variable.</maml:para>
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples>
+      <command:example>
+        <maml:title>-------------------------- Example 1 --------------------------</maml:title>
+        <dev:code>PS C:\&gt; Get-PSGeminiKnownCertificates gemini.circumlunar.space | Format-List
+
+HostName       : gemini.circumlunar.space                                                           
+Fingerprint    : 04A89008021E8F7AD7C73498D9147CC1D1122858FDB02DE0D50F82491F8CAF7CD525A2B410A20871A6AC7DB75AF7A1CE04C2F6628378108F8D6AB38EB8748D79BD
+ExpirationDate : 10/03/2025 09:50:37</dev:code>
+        <dev:remarks>
+          <maml:para>Fetches the trusted certificate for the named domain.  (Piped to `Format-List` for readability.)</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+    <command:relatedLinks>
+      <maml:navigationLink>
+        <maml:linkText>Online Version:</maml:linkText>
+        <maml:uri>https://github.com/rhymeswithmogul/PSGemini/blob/main/man/en-US/Get-PSGeminiKnownCertificates.md</maml:uri>
+      </maml:navigationLink>
+      <maml:navigationLink>
+        <maml:linkText>Add-PSGeminiKnownCertificate</maml:linkText>
+        <maml:uri></maml:uri>
+      </maml:navigationLink>
+      <maml:navigationLink>
+        <maml:linkText>Remove-PSGeminiKnownCertificate</maml:linkText>
+        <maml:uri></maml:uri>
+      </maml:navigationLink>
+      <maml:navigationLink>
+        <maml:linkText>Invoke-GeminiRequest</maml:linkText>
+        <maml:uri></maml:uri>
+      </maml:navigationLink>
+    </command:relatedLinks>
+  </command:command>
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+    <command:details>
+      <command:name>Invoke-GeminiRequest</command:name>
+      <command:verb>Invoke</command:verb>
+      <command:noun>GeminiRequest</command:noun>
+      <maml:description>
+        <maml:para>Gets content from a Gemini server on the Internet.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>The `Invoke-GeminiRequest` cmdlet sends a Gemini request to a Gemini server.  It parses the response and returns collections of links, images, and other significant elements.</maml:para>
+    </maml:description>
+    <command:syntax>
+      <command:syntaxItem>
+        <maml:name>Invoke-GeminiRequest</maml:name>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="0" aliases="Url">
+          <maml:name>Uri</maml:name>
+          <maml:description>
+            <maml:para>The fully-qualified URI of the resource you'd like to access.  Be sure to include the protocol (`gemini://`).  If no port is specified, the default port of TCP 1965 is assumed.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">Uri</command:parameterValue>
+          <dev:type>
+            <maml:name>Uri</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>Certificate</maml:name>
+          <maml:description>
+            <maml:para>You can use this parameter to provide a client certificate.  Specify it as an `[X509Certificate]` or `[X509Certificate2]` object.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">X509Certificate</command:parameterValue>
+          <dev:type>
+            <maml:name>X509Certificate</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>FavIcon</maml:name>
+          <maml:description>
+            <maml:para>Specify this switch and this cmdlet will also grab the site's favicon.  For more information, see the draft RFC (https://portal.mozz.us/gemini/mozz.us/files/rfc_gemini_favicon.gmi).</maml:para>
+            <maml:para>When used with `-OutFile`, this has no effect.</maml:para>
+          </maml:description>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="True (ByValue)" position="named" aliases="Input">
+          <maml:name>InputObject</maml:name>
+          <maml:description>
+            <maml:para>To provide input to the remote server, specify it here.  Input will not be provided unless the server specifically requests it.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>OutFile</maml:name>
+          <maml:description>
+            <maml:para>To save the content of the response, specify this parameter.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>SkipCertificateCheck</maml:name>
+          <maml:description>
+            <maml:para>Gemini trusts remote servers based on their certificate by a trust-on-first-use (TOFU) model, as opposed to the PKI infrastructure and hostname checks done in most SSL/TLS connections (i.e., HTTPS).  To satisfy this condition, PSGemini keeps an internal store of all certificates that it finds.</maml:para>
+            <maml:para>If, for some reason, you'd like to bypass this check, specify this parameter.  Note that this is NOT SECURE and NOT RECOMMENDED and should be used for debugging purposes only.</maml:para>
+          </maml:description>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
+        </command:parameter>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>Certificate</maml:name>
+        <maml:description>
+          <maml:para>You can use this parameter to provide a client certificate.  Specify it as an `[X509Certificate]` or `[X509Certificate2]` object.</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">X509Certificate</command:parameterValue>
+        <dev:type>
+          <maml:name>X509Certificate</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>FavIcon</maml:name>
+        <maml:description>
+          <maml:para>Specify this switch and this cmdlet will also grab the site's favicon.  For more information, see the draft RFC (https://portal.mozz.us/gemini/mozz.us/files/rfc_gemini_favicon.gmi).</maml:para>
+          <maml:para>When used with `-OutFile`, this has no effect.</maml:para>
+        </maml:description>
+        <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+        <dev:type>
+          <maml:name>SwitchParameter</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>False</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="True (ByValue)" position="named" aliases="Input">
+        <maml:name>InputObject</maml:name>
+        <maml:description>
+          <maml:para>To provide input to the remote server, specify it here.  Input will not be provided unless the server specifically requests it.</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>OutFile</maml:name>
+        <maml:description>
+          <maml:para>To save the content of the response, specify this parameter.</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>SkipCertificateCheck</maml:name>
+        <maml:description>
+          <maml:para>Gemini trusts remote servers based on their certificate by a trust-on-first-use (TOFU) model, as opposed to the PKI infrastructure and hostname checks done in most SSL/TLS connections (i.e., HTTPS).  To satisfy this condition, PSGemini keeps an internal store of all certificates that it finds.</maml:para>
+          <maml:para>If, for some reason, you'd like to bypass this check, specify this parameter.  Note that this is NOT SECURE and NOT RECOMMENDED and should be used for debugging purposes only.</maml:para>
+        </maml:description>
+        <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+        <dev:type>
+          <maml:name>SwitchParameter</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>False</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="0" aliases="Url">
+        <maml:name>Uri</maml:name>
+        <maml:description>
+          <maml:para>The fully-qualified URI of the resource you'd like to access.  Be sure to include the protocol (`gemini://`).  If no port is specified, the default port of TCP 1965 is assumed.</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">Uri</command:parameterValue>
+        <dev:type>
+          <maml:name>Uri</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+    </command:parameters>
+    <command:inputTypes>
+      <command:inputType>
+        <dev:type>
+          <maml:name>System.String</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para>This cmdlet accepts pipeline input for the `-InputObject` parameter.</maml:para>
+        </maml:description>
+      </command:inputType>
+    </command:inputTypes>
+    <command:returnValues>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>System.Management.Automation.PSObject</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para>This cmdlet generates an object similar to that generated by `Invoke-WebRequest` and `Invoke-GopherRequest`.</maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>System.Void</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para>When using the `-OutFile` parameter or parameter set, no output will be generated.  The content will be saved to a file (if successful).</maml:para>
+        </maml:description>
+      </command:returnValue>
+    </command:returnValues>
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para>Client certificate checking has not been fully tested yet.</maml:para>
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples>
+      <command:example>
+        <maml:title>-------------------------- Example 1 --------------------------</maml:title>
+        <dev:code>PS C:\&gt; Invoke-GeminiRequest gemini://gemini.circumlunar.space
+
+StatusCode        : 20
+StatusDescription : text/gemini
+Content           : # Project Gemini
+                    
+                    ## Overview
+                    
+                    Gemini is a new internet protocol which:
+                    
+                    * Is heavier than gopher
+                    * Is lighter than the web
+                    * Will not replace either
+                    * Strives for maximum power to weight ratio
+                    * Takes user privacy very seriously
+[…]</dev:code>
+        <dev:remarks>
+          <maml:para>Connects to the Gemini server at gemini.circumlunar.space and returns the result.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>--------------------- Example 2: Downloads ---------------------</maml:title>
+        <dev:code>PS /Users/colin&gt; Invoke-GeminiRequest -UseSSL gemini://colincogle.name/pgp/pgp.txt -OutFile pgp.txt
+PS /Users/colin&gt; Get-Item pgp.txt                            
+
+    Directory: /Users/colin
+
+UnixMode   User             Group                 LastWriteTime           Size Name
+--------   ----             -----                 -------------           ---- ----
+-rw-r--r-- colin            wheel                2/8/2022 08:05           5218 pgp.txt</dev:code>
+        <dev:remarks>
+          <maml:para>You can use the `-OutFile` switch to download files from Gemspace.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+    <command:relatedLinks>
+      <maml:navigationLink>
+        <maml:linkText>Online Version:</maml:linkText>
+        <maml:uri>https://github.com/rhymeswithmogul/PSGemini/blob/main/man/en-US/Invoke-GeminiRequest.md</maml:uri>
+      </maml:navigationLink>
+      <maml:navigationLink>
+        <maml:linkText>Get-PSGeminiKnownCertificate</maml:linkText>
+        <maml:uri></maml:uri>
+      </maml:navigationLink>
+      <maml:navigationLink>
+        <maml:linkText>Invoke-WebRequest</maml:linkText>
+        <maml:uri></maml:uri>
+      </maml:navigationLink>
+      <maml:navigationLink>
+        <maml:linkText>Invoke-GopherRequest</maml:linkText>
+        <maml:uri></maml:uri>
+      </maml:navigationLink>
+    </command:relatedLinks>
+  </command:command>
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+    <command:details>
+      <command:name>Remove-PSGeminiKnownCertificate</command:name>
+      <command:verb>Remove</command:verb>
+      <command:noun>PSGeminiKnownCertificate</command:noun>
+      <maml:description>
+        <maml:para>Removes a certificate from PSGemini's internal store.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>This cmdlet will remove a certificate, indicated by either the host name or the fingerprint, from PSGemini's internal store.</maml:para>
+      <maml:para>This cmdlet is meant to be used internally by Invoke-GeminiRequest, but regular users may (or may not) find a use for it.</maml:para>
+    </maml:description>
+    <command:syntax>
+      <command:syntaxItem>
+        <maml:name>Remove-PSGeminiKnownCertificate</maml:name>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>Fingerprint</maml:name>
+          <maml:description>
+            <maml:para>The fingerprint of a certificate present in the store.  The exact format of the fingerprint is left to the PowerShell runtime.  You must match whichever format that it stores.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+      </command:syntaxItem>
+      <command:syntaxItem>
+        <maml:name>Remove-PSGeminiKnownCertificate</maml:name>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>HostName</maml:name>
+          <maml:description>
+            <maml:para>The hostname of a certificate.  This will match only the legacy Subject (CN=...) field, ignoring the SAN (subjectAltName) values, as the Gemini specification, as written, only checks the fingerprint and the expiration date.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>Fingerprint</maml:name>
+        <maml:description>
+          <maml:para>The fingerprint of a certificate present in the store.  The exact format of the fingerprint is left to the PowerShell runtime.  You must match whichever format that it stores.</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>HostName</maml:name>
+        <maml:description>
+          <maml:para>The hostname of a certificate.  This will match only the legacy Subject (CN=...) field, ignoring the SAN (subjectAltName) values, as the Gemini specification, as written, only checks the fingerprint and the expiration date.</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+    </command:parameters>
+    <command:inputTypes>
+      <command:inputType>
+        <dev:type>
+          <maml:name>None</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para>This cmdlet does not accept pipeline input.</maml:para>
+        </maml:description>
+      </command:inputType>
+    </command:inputTypes>
+    <command:returnValues>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>System.Void</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para>This cmdlet does not generate output.</maml:para>
+        </maml:description>
+      </command:returnValue>
+    </command:returnValues>
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para>The PSGemini certificate store is saved in ~/.PSGemini_known_hosts.csv.  You may override this by setting the `$env:PSGeminiTOFUPath` variable.</maml:para>
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples>
+      <command:example>
+        <maml:title>-------------------------- Example 1 --------------------------</maml:title>
+        <dev:code>PS C:\&gt; Remove-PSGeminiKnownCertificate -HostName gemini.circumlunar.space</dev:code>
+        <dev:remarks>
+          <maml:para>Removes gemini.circumlunar.space's certificate from the store.  The next time `Invoke-GeminiRequest` is run, it will implicitly trust any certificate it is presented.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- Example 2 --------------------------</maml:title>
+        <dev:code>PS C:\&gt; Remove-PSGeminiKnownCertificate -Fingerprint '04A89008021E8F7AD7C73498D9147CC1D1122858FDB02DE0D50F82491F8CAF7CD525A2B410A20871A6AC7DB75AF7A1CE04C2F6628378108F8D6AB38EB8748D79BD'</dev:code>
+        <dev:remarks>
+          <maml:para>Removes that specific certificate from the store.  The next time that the user runs `Invoke-GeminiRequest`, it will implicitly trust any certificate that the server presents.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+    <command:relatedLinks>
+      <maml:navigationLink>
+        <maml:linkText>Online Version:</maml:linkText>
+        <maml:uri>https://github.com/rhymeswithmogul/PSGemini/blob/main/man/en-US/Remove-PSGeminiKnownCertificate.md</maml:uri>
+      </maml:navigationLink>
+      <maml:navigationLink>
+        <maml:linkText>Add-PSGeminiKnownCertificate</maml:linkText>
+        <maml:uri></maml:uri>
+      </maml:navigationLink>
+      <maml:navigationLink>
+        <maml:linkText>Get-PSGeminiKnownCertificates</maml:linkText>
+        <maml:uri></maml:uri>
+      </maml:navigationLink>
+      <maml:navigationLink>
+        <maml:linkText>Invoke-GeminiRequest</maml:linkText>
+        <maml:uri></maml:uri>
+      </maml:navigationLink>
+    </command:relatedLinks>
+  </command:command>
+</helpItems>

@@ -7,7 +7,7 @@ Grab it from PowerShell Gallery with: `Install-Module PSGemini`
 ## Usage
 In this example, we'll connect to a Gemini server and return the content.
 
-```powershell
+```
 PS C:\> Invoke-GeminiRequest gemini://gemini.circumlunar.space
 WARNING: First visit. Memorizing new certificate for gemini.circumlunar.space
 
@@ -29,7 +29,7 @@ Content           : # Project Gemini
 
 The syntax and output of this cmdlet is modeled after [`Invoke-WebRequest`](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/invoke-webrequest) and [`Invoke-GopherRequest`](https://github.com/rhymeswithmogul/PSGopher), going as far as to emulate some of its properties:
 
-```powershell
+```
 PS /home/colin> igemr gemini://gemini.circumlunar.space
 
 StatusCode        : 20
