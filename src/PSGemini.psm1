@@ -557,6 +557,8 @@ Function Add-PSGeminiKnownCertificate {
 	)
 
 	Write-Verbose "Memorizing certificate for $HostName with fingerprint $Fingerprint and expiration date $ExpirationDate."
+
+	$env:PSGeminiTOFUPath ??= (Join-Path -Path $env:HOME -ChildPath '.PSGemini_known_hosts.csv')
 	Export-CSV -Path $env:PSGeminiTOFUPath -Append -Delimiter ',' -InputObject ([PSCustomObject]@{
 		HostName = $HostName
 		Fingerprint = $Fingerprint
@@ -576,6 +578,8 @@ Function Remove-PSGeminiKnownCertificate {
 		[ValidateNotNullOrEmpty()]
 		[String] $Fingerprint
 	)
+
+	$env:PSGeminiTOFUPath ??= (Join-Path -Path $env:HOME -ChildPath '.PSGemini_known_hosts.csv')
 
 	If (-Not (Test-Path -Path $env:PSGeminiTOFUPath -PathType Leaf)) {
 		Return $null
