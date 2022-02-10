@@ -86,6 +86,8 @@ ModuleList = @()
 
 # List of all files packaged with this module
 FileList = @(
+	'en-US/about_PSGemini.help.txt',
+	'en-US/PSGemini-help.xml',
 	'src/PSGemini.psm1',
 	'AUTHORS',
 	'CHANGELOG.md',
@@ -117,7 +119,7 @@ PrivateData = @{
 		ReleaseNotes = 'First release!  Client certificate functionality untested.'
 
 		# Prerelease string of this module
-		Prerelease = 'beta'
+		#Prerelease = ''
 
 		# Flag to indicate whether the module requires explicit user acceptance for install/update/save
 		RequireLicenseAcceptance = $false
