@@ -1,6 +1,6 @@
 # PSGemini ChangeLog
 
-## Version 1.0.1
+## Version 1.0.2 and 1.0.1
 If `$env:PSGeminiTOFUPath` was not defined, certificates could not be reliably added or removed.  This has been corrected by checking for null or undefined values.
 
 ## Version 1.0.0

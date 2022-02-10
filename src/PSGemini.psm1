@@ -514,7 +514,7 @@ Function Get-PSGeminiKnownCertificates {
 	)
 
 	Write-Debug "Looking for a certificate for $HostName."
-	$env:PSGeminiTOFUPath ??= (Join-Path -Path $env:HOME -ChildPath '.PSGemini_known_hosts.csv')
+	$env:PSGeminiTOFUPath ??= (Join-Path -Path $HOME -ChildPath '.PSGemini_known_hosts.csv')
 
 	If (Test-Path -Path $env:PSGeminiTOFUPath -PathType Leaf) {
 		Write-Debug "Found a certificate store at ${env:PSGeminiTOFUPath}."
@@ -558,7 +558,7 @@ Function Add-PSGeminiKnownCertificate {
 
 	Write-Verbose "Memorizing certificate for $HostName with fingerprint $Fingerprint and expiration date $ExpirationDate."
 
-	$env:PSGeminiTOFUPath ??= (Join-Path -Path $env:HOME -ChildPath '.PSGemini_known_hosts.csv')
+	$env:PSGeminiTOFUPath ??= (Join-Path -Path $HOME -ChildPath '.PSGemini_known_hosts.csv')
 	Export-CSV -Path $env:PSGeminiTOFUPath -Append -Delimiter ',' -InputObject ([PSCustomObject]@{
 		HostName = $HostName
 		Fingerprint = $Fingerprint
@@ -579,7 +579,7 @@ Function Remove-PSGeminiKnownCertificate {
 		[String] $Fingerprint
 	)
 
-	$env:PSGeminiTOFUPath ??= (Join-Path -Path $env:HOME -ChildPath '.PSGemini_known_hosts.csv')
+	$env:PSGeminiTOFUPath ??= (Join-Path -Path $HOME -ChildPath '.PSGemini_known_hosts.csv')
 
 	If (-Not (Test-Path -Path $env:PSGeminiTOFUPath -PathType Leaf)) {
 		Return $null
