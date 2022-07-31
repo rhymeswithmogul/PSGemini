@@ -13,7 +13,8 @@ Adds an SSL certificate to the PSGemini certificate store.
 ## SYNTAX
 
 ```
-Add-PSGeminiKnownCertificate [-HostName] <String> [-Fingerprint] <String> [-ExpirationDate] <DateTime> [<CommonParameters>]
+Add-PSGeminiKnownCertificate [-HostName] <String> [-Fingerprint] <String> [-ExpirationDate] <DateTime>
+ [<CommonParameters>]
 ```
 
 ## DESCRIPTION

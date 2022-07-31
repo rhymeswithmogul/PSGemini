@@ -601,7 +601,7 @@ UnixMode   User             Group                 LastWriteTime           Size N
     <command:examples>
       <command:example>
         <maml:title>-------------------------- Example 1 --------------------------</maml:title>
-        <dev:code>PS C:\&gt; Remove-PSGeminiKnownCertificate -HostName gemini.circumlunar.space</dev:code>
+        <dev:code>PS C:\&gt; Remove-PSGeminiKnownCertificate gemini.circumlunar.space</dev:code>
         <dev:remarks>
           <maml:para>Removes gemini.circumlunar.space's certificate from the store.  The next time `Invoke-GeminiRequest` is run, it will implicitly trust any certificate it is presented.</maml:para>
         </dev:remarks>

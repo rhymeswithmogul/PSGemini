@@ -1,3 +1,6 @@
+VERSION 1.0.3
+Improved the usage of Remove-PSGeminiKnownCertificate.
+
 VERSIONS 1.0.2 and 1.0.1
 Fixed certificate store issues that slipped past the cracks.
 

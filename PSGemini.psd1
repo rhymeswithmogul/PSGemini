@@ -4,7 +4,7 @@
 RootModule = 'src/PSGemini.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.0.2'
+ModuleVersion = '1.0.3'
 
 # Supported PSEditions
 CompatiblePSEditions = @('Core', 'Desktop')
@@ -116,8 +116,8 @@ PrivateData = @{
 		# IconUri = ''
 
 		# ReleaseNotes of this module
-		ReleaseNotes = 'First release!  Client certificate functionality untested.'
-
+		ReleaseNotes = 'Tiny bug fix.'
+		
 		# Prerelease string of this module
 		#Prerelease = ''
 

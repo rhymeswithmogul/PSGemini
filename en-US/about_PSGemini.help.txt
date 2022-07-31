@@ -73,15 +73,16 @@ EXAMPLES
     […]
 
     EXAMPLE 2: DOWNLOAD RESOURCES
-    PS> Invoke-GeminiRequest -UseSSL gemini://colincogle.name/pgp/pgp.txt `
+    PS> Invoke-GeminiRequest gemini://colincogle.name/pgp/pgp.txt `
       >    -OutFile pgp.txt
-    PS> Get-Item pgp.txt                            
+
+    PS> Get-Item pgp.txt
     
         Directory: /Users/colin
     
-    UnixMode   User             Group                 LastWriteTime           Size Name
-    --------   ----             -----                 -------------           ---- ----
-    -rw-r--r-- colin            wheel                2/8/2022 08:05           5218 pgp.txt
+    UnixMode   User     Group          LastWriteTime           Size Name
+    --------   ----     -----          -------------           ---- ----
+    -rw-r--r-- colin    wheel          2/8/2022 08:05          5218 pgp.txt
 
 NOTE
     The official Gemini protocol specification eschews the traditional CA-based

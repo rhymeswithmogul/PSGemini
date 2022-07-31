@@ -568,6 +568,7 @@ Function Add-PSGeminiKnownCertificate {
 }
 
 Function Remove-PSGeminiKnownCertificate {
+	[CmdletBinding(DefaultParameterSetName='HostName')]
 	[OutputType([Void])]
 	Param(
 		[Parameter(Mandatory, ParameterSetName='HostName')]

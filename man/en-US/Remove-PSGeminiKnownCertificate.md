@@ -12,7 +12,7 @@ Removes a certificate from PSGemini's internal store.
 
 ## SYNTAX
 
-### HostName
+### HostName (Default)
 ```
 Remove-PSGeminiKnownCertificate -HostName <String> [<CommonParameters>]
 ```
@@ -31,7 +31,7 @@ This cmdlet is meant to be used internally by Invoke-GeminiRequest, but regular 
 
 ### Example 1
 ```powershell
-PS C:\> Remove-PSGeminiKnownCertificate -HostName gemini.circumlunar.space
+PS C:\> Remove-PSGeminiKnownCertificate gemini.circumlunar.space
 ```
 
 Removes gemini.circumlunar.space's certificate from the store.  The next time `Invoke-GeminiRequest` is run, it will implicitly trust any certificate it is presented.
