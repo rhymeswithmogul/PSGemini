@@ -1,3 +1,5 @@
+[![PowerShell Gallery Version (including pre-releases)](https://img.shields.io/powershellgallery/v/PSGemini?include_prereleases)](https://powershellgallery.com/packages/PSGemini/) [![PowerShell Gallery](https://img.shields.io/powershellgallery/dt/PSGemini)](https://powershellgallery.com/packages/v/PSGemini)
+
 # PSGemini
 A [Gemini](https://gemini.circumlunar.space/) client written for PowerShell 7 and newer.
 
