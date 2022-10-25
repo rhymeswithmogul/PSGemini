@@ -1,5 +1,8 @@
 # PSGemini ChangeLog
 
+## Version 1.0.5
+Code cleanup.
+
 ## Version 1.0.4
 *  The `-Fingerprint` parameter to `Remove-PSGeminiKnownCertificate` did not work.  This has been corrected.
 *  `Remove-PSGeminiKnownCertificate` now supports `ShouldProcess` (`-Confirm` and `-WhatIf`).

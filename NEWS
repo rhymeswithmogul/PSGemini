@@ -1,4 +1,4 @@
-VERSION 1.0.4
+VERSIONS 1.0.5 and 1.0.4
 Fixed a bug in Remove-PSGeminiKnownCertificate where certificates could not be
 deleted by fingerprint.
 

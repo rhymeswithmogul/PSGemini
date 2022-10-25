@@ -454,8 +454,7 @@ Function Invoke-GeminiRequest
 	}
 	Else
 	{
-		$response -Split "([`r`n]+)" | ForEach-Object -ScriptBlock
-		{
+		$response -Split "([`r`n]+)" | ForEach-Object {
 			#Write-Debug "OUTPUT: $($_ -Replace "`r",'' -Replace "`n",'')"
 
 			# Build content variable
@@ -582,8 +581,7 @@ Function Get-PSGeminiKnownCertificate
 	{
 		Write-Debug "Found a certificate store at ${env:PSGeminiTOFUPath}."
 		$AllCerts = @()
-		Import-CSV -Path $env:PSGeminiTOFUPath | ForEach-Object -ScriptBlock
-		{
+		Import-CSV -Path $env:PSGeminiTOFUPath | ForEach-Object	{
 			If ($null -eq $HostName  -or  $HostName -In @('', $_.HostName))
 			{
 				$NotAfter = [DateTime]::FromFileTimeUTC($_.ExpirationDate)
