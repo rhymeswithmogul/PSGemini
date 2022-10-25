@@ -100,7 +100,7 @@ Function Invoke-GeminiRequest {
 	
 			# We've connected to this server before, but the old certificate expired.
 			ElseIf ($trustedCert.ExpirationDate -lt (Get-Date)) {
-				Remove-PSGeminiKnownCertificate -HostName $Uri.Host
+				Remove-PSGeminiKnownCertificate -HostName $Uri.Host -Confirm:$false
 				Write-Warning "Subsequent visit. Memorizing new certificate for $($Uri.Host)"
 				Add-PSGeminiKnownCertificate -HostName $Uri.Host -Fingerprint $cert.GetPublicKeyString() -ExpirationDate (Get-Date $cert.GetExpirationDateString())
 			}
@@ -568,7 +568,10 @@ Function Add-PSGeminiKnownCertificate {
 }
 
 Function Remove-PSGeminiKnownCertificate {
-	[CmdletBinding(DefaultParameterSetName='HostName')]
+	[CmdletBinding(
+		SupportsShouldProcess, ConfirmImpact='Low',
+		DefaultParameterSetName='HostName'
+	)]
 	[OutputType([Void])]
 	Param(
 		[Parameter(Mandatory, ParameterSetName='HostName')]
@@ -603,6 +606,8 @@ Function Remove-PSGeminiKnownCertificate {
 
 	If ($null -ne $FoundCert) {
 		Write-Debug "Removing certificate for $($FoundCert.HostName):  expires=$([DateTime]::FromFileTimeUtc($FoundCert.ExpirationDate)), fingerprint=$($FoundCert.Fingerprint)"
-		$AllCerts | Where-Object HostName -ne $HostName | Export-CSV -Path $env:PSGeminiTOFUPath -Force
+		If ($PSCmdlet.ShouldProcess($FoundCert.Fingerprint, 'Remove from TOFU store')) {
+			$AllCerts | Where-Object {$_ -ne $FoundCert} | Export-CSV -Path $env:PSGeminiTOFUPath -Force
+		}
 	}
 }
