@@ -116,7 +116,7 @@ PrivateData = @{
 		# IconUri = ''
 
 		# ReleaseNotes of this module
-		ReleaseNotes = 'Tiny bug fix.'
+		ReleaseNotes = 'Fix server certificate handling problems'
 
 		# Prerelease string of this module
 		#Prerelease = ''

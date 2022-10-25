@@ -1,4 +1,5 @@
-Function Invoke-GeminiRequest {
+Function Invoke-GeminiRequest
+{
 	[CmdletBinding(DefaultParameterSetName='ToScreen')]
 	[OutputType([PSCustomObject], ParameterSetName='ToScreen')]
 	[OutputType([Void], ParameterSetName='OutFile')]
@@ -30,14 +31,16 @@ Function Invoke-GeminiRequest {
 
 	# PowerShell doesn't recognize the gemini:// scheme.  Thus, we need to
 	# re-define our URI object with the port explicitly mentioned.
-	If ($Uri.Port -eq -1) {
+	If ($Uri.Port -eq -1)
+	{
 		$newURI = "gemini://" + $Uri.Host + ":1965" + $Uri.AbsolutePath + ($Uri.Query ? "?$($Uri.Query)" : '')
 		$Uri = $Uri::new($newURI)
 	}
 
 	#region Establish TCP connection.
 	Write-Verbose "Connecting to $($Uri.Host)"
-	Try {
+	Try
+	{
 		$TcpSocket = [Net.Sockets.TcpClient]::new($Uri.Host, $Uri.Port)
 		$TcpStream = $TcpSocket.GetStream()
 		$TcpStream.ReadTimeout = 2000 #milliseconds
@@ -48,10 +51,13 @@ Function Invoke-GeminiRequest {
 		# Trust-on-first-use logic happens a little later on.
 		$secureStream = [Net.Security.SslStream]::new($TcpStream, $false, {$true}, $null)
 
-		If ($null -ne $Certificate) {
+		If ($null -ne $Certificate)
+		{
 			Write-Verbose "Using a client certificate."
 			Write-Debug $Certificate
-		} Else {
+		}
+		Else
+		{
 			Write-Debug "Not using a client certificate."
 		}
 		$secureStream.AuthenticateAsClient(
@@ -64,7 +70,8 @@ Function Invoke-GeminiRequest {
 		Write-Verbose "Connected to $($Uri.Host) with $($TcpStream.SslProtocol)."
 		Write-Debug "Using $($TcpStream.SslProtocol) with ciphersuite $($TcpStream.NegotiatedCipherSuite)."
 	}
-	Catch {
+	Catch
+	{
 		# Throw a non-terminating error so that $? is set properly and the
 		# pipeline can continue.  This will allow chaining operators to work as
 		# intended.  Should a future version of this module support pipeline
@@ -82,24 +89,29 @@ Function Invoke-GeminiRequest {
 	#endregion (Establish TCP connection)
 
 	#region Certificate TOFU validation
-	If ($SkipCertificateCheck) {
+	If ($SkipCertificateCheck)
+	{
 		Write-Warning 'Skipping certificate validation.  This is not secure!'
 	}
-	Else {
+	Else
+	{
 		$cert = $TcpStream.RemoteCertificate
 		Write-Debug "This certificate:    Fingerprint=$($cert.GetPublicKeyString()) Expires=$(Get-Date $cert.GetExpirationDateString())"
 		$trustedCert = Get-PSGeminiKnownCertificate -HostName $Uri.Host
 	
-		If ($null -ne $trustedCert) {
+		If ($null -ne $trustedCert)
+		{
 			Write-Debug "Trusted certificate: Fingerprint=$($trustedCert.Fingerprint) Expires=$($trustedCert.ExpirationDate)"
 	
 			# We've connected to this server before, and this is the same certificate.
-			If ($cert.GetPublicKeyString() -eq $trustedCert.Fingerprint) {
+			If ($cert.GetPublicKeyString() -eq $trustedCert.Fingerprint)
+			{
 				Write-Verbose "Certificate validation succeeded."
 			}
 	
 			# We've connected to this server before, but the old certificate expired.
-			ElseIf ($trustedCert.ExpirationDate -lt (Get-Date)) {
+			ElseIf ($trustedCert.ExpirationDate -lt (Get-Date))
+			{
 				Remove-PSGeminiKnownCertificate -HostName $Uri.Host -Confirm:$false
 				Write-Warning "Subsequent visit. Memorizing new certificate for $($Uri.Host)"
 				Add-PSGeminiKnownCertificate -HostName $Uri.Host -Fingerprint $cert.GetPublicKeyString() -ExpirationDate (Get-Date $cert.GetExpirationDateString())
@@ -107,14 +119,16 @@ Function Invoke-GeminiRequest {
 	
 			# We've connected to the server before, but the old certificate should
 			# still be valid.
-			Else {
+			Else
+			{
 				Write-Error "$($Uri.Host) presented a new certificate, and the memorized one is still valid.  Failing the connection for your own safety."
 				Write-Debug "This: $($trustedCert.Fingerprint))"
 				Write-Debug "That: $($cert.GetPublicKeyString())"
 				Return $null
 			}
 		}
-		Else {
+		Else
+		{
 			Write-Warning "First visit. Memorizing new certificate for $($Uri.Host)"
 			Add-PSGeminiKnownCertificate -HostName $Uri.Host -Fingerprint $cert.GetPublicKeyString() -ExpirationDate (Get-Date $cert.GetExpirationDateString())
 		}	
@@ -139,7 +153,8 @@ Function Invoke-GeminiRequest {
 	$Encoder = [Text.UTF8Encoding]::new()
 	$buffer = New-Object Byte[] 1029	# <STATUS><SPACE><META><CR><LF>
 
-	While (($response -NotLike "*`r`n") -and (0 -ne ($bytesRead = $TcpStream.Read($buffer, 0, 1)))) {
+	While (($response -NotLike "*`r`n") -and (0 -ne ($bytesRead = $TcpStream.Read($buffer, 0, 1))))
+	{
 		Write-Debug "`tReading a byte from the server."
 		$response += $Encoder.GetString($buffer, 0, $bytesRead)
 	}
@@ -157,30 +172,42 @@ Function Invoke-GeminiRequest {
 	# to work as intended.  Should a future version of this module support
 	# pipeline input, that will let this cmdlet keep running with other input
 	# URIs.
-	Switch ($Status) { 
-		10 <# input #> {
+	Switch ($Status)
+	{ 
+		10	# input
+		{
 			$InputObject ??= Read-Host -Prompt ($Meta ?? 'The server is requesting input: ')
 			Return (Invoke-GeminiRequest "$Uri?$InputObject" -OutFile $OutFile)
 		}
-		11 <# sensitive input #> {
+
+		11	# sensitive input
+		{
 			$InputObject ??= Read-Host -Prompt ($Meta ?? 'The server is requesting input: ') -MaskInput
 			Return (Invoke-GeminiRequest "$Uri?$InputObject" -OutFile $OutFile)
 		}
-		20 <# success #> {
+
+		20	# success
+		{
 			# If the server didn't send a MIME type, assume it to be this.
 			# See section 3.3 of the Gemini specification.
 			$Meta ??= 'text/gemini; charset=utf-8'
 			Break
 		}
-		30 {
+
+		30	# temporary redirect
+		{
 			Write-Warning "Temporary redirect encountered.  Redirecting to $Meta"
 			Return (Invoke-GeminiRequest $Meta -OutFile:$OutFile)
 		}
-		31 {
+
+		31	# permanent redirect
+		{
 			Write-Warning "Permanent redirect encountered.  Redirecting to $Meta"
 			Return (Invoke-GeminiRequest $Meta -OutFile:$OutFile)
 		}
-		40 {
+
+		40	# temporary failure
+		{
 			$er = [Management.Automation.ErrorRecord]::new(
 				[Net.ProtocolViolationException]::new("A temporary failure occurred.  The server said: $Meta"),
 				'TemporaryFailure',
@@ -191,7 +218,9 @@ Function Invoke-GeminiRequest {
 			$PSCmdlet.WriteError($er)
 			Return $null
 		}
-		41 {
+
+		41	# server not available
+		{
 			$er = [Management.Automation.ErrorRecord]::new(
 				[Net.ProtocolViolationException]::new("The server is not available.  The server said: $Meta"),
 				'ServerUnavailable',
@@ -202,7 +231,9 @@ Function Invoke-GeminiRequest {
 			$PSCmdlet.WriteError($er)
 			Return $null
 		}
-		42 {
+
+		42	# CGI error
+		{
 			$er = [Management.Automation.ErrorRecord]::new(
 				[Net.ProtocolViolationException]::new("A CGI error occurred.  The server said: $Meta"),
 				'CGIError',
@@ -213,7 +244,9 @@ Function Invoke-GeminiRequest {
 			$PSCmdlet.WriteError($er)
 			Return $null
 		}
-		43 {
+
+		43	# proxy error
+		{
 			$er = [Management.Automation.ErrorRecord]::new(
 				[Net.ProtocolViolationException]::new("A proxy error occurred.  The server said: $Meta"),
 				'ProxyError',
@@ -224,7 +257,9 @@ Function Invoke-GeminiRequest {
 			$PSCmdlet.WriteError($er)
 			Return $null
 		}
-		44 {
+
+		44	# rate-limiting
+		{
 			Write-Warning "Slow down.  The server provided this error: $Meta"
 			For ($i = $Meta; $i -lt 0; $i++) {
 				Write-Progress -Activity 'Waiting to retry this request.' -SecondsRemaining $i
@@ -232,7 +267,9 @@ Function Invoke-GeminiRequest {
 			}
 			Invoke-GeminiRequest -InputObject:$InputObject -OutFile:$OutFile -SslVersion:$SslVersion -Uri:$Uri
 		}
-		50 {
+
+		50	# request failed
+		{
 			$er = [Management.Automation.ErrorRecord]::new(
 				[Net.ProtocolViolationException]::new("The request failed.  The server said: $Meta"),
 				'PermanentFailure',
@@ -243,7 +280,9 @@ Function Invoke-GeminiRequest {
 			$PSCmdlet.WriteError($er)
 			Return $null
 		}
-		51 {
+
+		51	# resource not found
+		{
 			$er = [Management.Automation.ErrorRecord]::new(
 				[Net.ProtocolViolationException]::new("The resource was not found.  The server said: $Meta"),
 				'ResourceNotFound',
@@ -254,7 +293,9 @@ Function Invoke-GeminiRequest {
 			$PSCmdlet.WriteError($er)
 			Return $null
 		}
-		52 {
+
+		52	# resource gone
+		{
 			$er = [Management.Automation.ErrorRecord]::new(
 				[Net.ProtocolViolationException]::new("The resource is permanently gone.  The server said: $Meta"),
 				'ResourceGone',
@@ -265,7 +306,9 @@ Function Invoke-GeminiRequest {
 			$PSCmdlet.WriteError($er)
 			Return $null
 		}
-		53 {
+
+		53	# proxy request refused
+		{
 			$er = [Management.Automation.ErrorRecord]::new(
 				[Net.ProtocolViolationException]::new("The proxy request was refused.  The server said: $Meta"),
 				'ProxyRequestRefused',
@@ -276,7 +319,9 @@ Function Invoke-GeminiRequest {
 			$PSCmdlet.WriteError($er)
 			Return $null
 		}
-		59 {
+
+		59	# bad request
+		{
 			$er = [Management.Automation.ErrorRecord]::new(
 				[Net.ProtocolViolationException]::new("The request was invalid.  The server said: $Meta"),
 				'BadRequest',
@@ -287,7 +332,9 @@ Function Invoke-GeminiRequest {
 			$PSCmdlet.WriteError($er)
 			Return $null
 		}
-		60 {
+
+		60	# client certificate required
+		{
 			$er = [Management.Automation.ErrorRecord]::new(
 				[Net.ProtocolViolationException]::new("A client certificate is required.  The server said: $Meta"),
 				'ClientCertificateRequired',
@@ -298,7 +345,9 @@ Function Invoke-GeminiRequest {
 			$PSCmdlet.WriteError($er)
 			Return $null
 		}
-		61 {
+
+		61	# client certificate rejected
+		{
 			$er = [Management.Automation.ErrorRecord]::new(
 				[Net.ProtocolViolationException]::new("The client certificate is not authorized.  The server said: $Meta"),
 				'ClientCertificateUnauthorized',
@@ -309,7 +358,9 @@ Function Invoke-GeminiRequest {
 			$PSCmdlet.WriteError($er)
 			Return $null
 		}
-		62 {
+
+		62	# client certificate invalid
+		{
 			$er = [Management.Automation.ErrorRecord]::new(
 				[Net.ProtocolViolationException]::new("The client certificate is not valid.  The server said: $Meta"),
 				'ClientCertificateInvalid',
@@ -320,6 +371,7 @@ Function Invoke-GeminiRequest {
 			$PSCmdlet.WriteError($er)
 			Return $null
 		}
+
 		default {
 			$er = [Management.Automation.ErrorRecord]::new(
 				[Net.ProtocolViolationException]::new("An invalid status code was received: $Response"),
@@ -348,7 +400,8 @@ Function Invoke-GeminiRequest {
 	# We will include these in a Headers object.
 	$Headers = @()
 	$Parameters = $Meta -Split ";\s*"
-	If ($Parameters.Length -gt 1) {
+	If ($Parameters.Length -gt 1)
+	{
 		$Parameter, $Value = $Parameters[1].Trim() -Split '='
 		Write-Debug "Found `"$Parameter`" with value `"$Value`""
 		$Headers += [PSCustomObject]@{$Parameter.Trim() = $Value.Trim()}
@@ -364,7 +417,8 @@ Function Invoke-GeminiRequest {
 		$Buffer     = New-Object Byte[] $BufferSize
 
 		Write-Debug 'Beginning to read textual data.'
-		While (0 -ne ($bytesRead = $TcpStream.Read($buffer, 0, $BufferSize))) {
+		While (0 -ne ($bytesRead = $TcpStream.Read($buffer, 0, $BufferSize)))
+		{
 			Write-Debug "`tReading ≤$BufferSize bytes from the server."
 			$response += $Encoder.GetString($buffer, 0, $bytesRead)
 		}
@@ -377,7 +431,8 @@ Function Invoke-GeminiRequest {
 		$Response   = [IO.MemoryStream]::new()
 
 		Write-Debug 'Beginning to read binary data.'
-		While (0 -ne ($bytesRead = $TcpStream.Read($buffer, 0, $BufferSize))) {
+		While (0 -ne ($bytesRead = $TcpStream.Read($buffer, 0, $BufferSize)))
+		{
 			Write-Debug "`tReading ≤$BufferSize bytes from the server."
 			$response.Write($buffer, 0, $bytesRead)
 		}
@@ -393,21 +448,27 @@ Function Invoke-GeminiRequest {
 	$Headings = @()
 	$Links    = @()
 
-	If ($BINARY_TRANSFER) {
+	If ($BINARY_TRANSFER)
+	{
 		$Content = $response.ToArray()
 	}
-	Else {
-		$response -Split "([`r`n]+)" | ForEach-Object {
+	Else
+	{
+		$response -Split "([`r`n]+)" | ForEach-Object -ScriptBlock
+		{
 			#Write-Debug "OUTPUT: $($_ -Replace "`r",'' -Replace "`n",'')"
 
 			# Build content variable
-			If ($_.Length -gt 0) {
+			If ($_.Length -gt 0)
+			{
 				$Content += $_
 			}
 
 			# Look for links and headings.
-			If (-Not $OutFile -and $Meta -CLike 'text/gemini*') {
-				If ($_.Length -gt 1  -and  $_[0] -eq '#') {
+			If (-Not $OutFile -and $Meta -CLike 'text/gemini*')
+			{
+				If ($_.Length -gt 1  -and  $_[0] -eq '#')
+				{
 					$Line = $_ -Split "\s+",2
 					$Headings += [PSCustomObject]@{
 						'Level'   = $Line[0].Trim().Length
@@ -416,7 +477,8 @@ Function Invoke-GeminiRequest {
 				}
 
 				# Links
-				ElseIf ($_.Length -gt 2  -and  $_.Substring(0,2) -eq '=>') {
+				ElseIf ($_.Length -gt 2  -and  $_.Substring(0,2) -eq '=>')
+				{
 					Write-Debug "Found a link: $_"
 					$foo, $href, $title = $_ -Split "\s+",3
 
@@ -458,17 +520,13 @@ Function Invoke-GeminiRequest {
 	#endregion
 
 	#region Deliver response
-	If ($OutFile) {
-		# check error
-		If ($BINARY_TRANSFER -or $true) {
-			Write-Verbose "Writing $($response.Length) bytes to $OutFile"
-			Set-Content -Path $OutFile -Value $Content -AsByteStream
-		} Else {
-			Write-Verbose "Writing $($Encoder.GetByteCount($response)) bytes to $OutFile"
-			Set-Content -Path $OutFile -Value $Content -Encoding 'UTF8'
-		}
+	If ($OutFile)
+	{
+		Write-Verbose "Writing $($response.Length) bytes to $OutFile"
+		Set-Content -Path $OutFile -Value $Content -AsByteStream
 	}
-	Else <# not to a file #> {
+	Else	# not writing to a file
+	{
 		$retval = [PSCustomObject]@{
 			'StatusCode' = $Status
 			'StatusDescription' = $Meta
@@ -484,14 +542,17 @@ Function Invoke-GeminiRequest {
 		# In the spirit of Gemini, this is disabled by default.
 		# PowerShell doesn't seem capable of combining emojis and modifiers, but
 		# we'll give it the ol' college try and show *something* to the user.
-		If ($FavIcon) {
+		If ($FavIcon)
+		{
 			$faviconUri = "gemini://$($Uri.Host):$($Uri.Port)/favicon.txt"
 			$icon       = $null
 
-			Try {
+			Try
+			{
 				$icon = (Invoke-GeminiRequest -Uri $faviconUri -Certificate:$Certificate -SkipCertificateCheck:$SkipCertificateCheck).Content
 			}
-			Catch {
+			Catch
+			{
 				Write-Verbose "Could not get a favicon from $faviconUri."
 			}
 
@@ -504,7 +565,8 @@ Function Invoke-GeminiRequest {
 	#endregion
 }
 
-Function Get-PSGeminiKnownCertificate {
+Function Get-PSGeminiKnownCertificate
+{
 	[CmdletBinding()]
 	[Alias('Get-PSGeminiKnownCertificates')]
 	[OutputType([PSCustomObject[]])]
@@ -516,11 +578,14 @@ Function Get-PSGeminiKnownCertificate {
 	Write-Debug "Looking for a certificate for $HostName."
 	$env:PSGeminiTOFUPath ??= (Join-Path -Path $HOME -ChildPath '.PSGemini_known_hosts.csv')
 
-	If (Test-Path -Path $env:PSGeminiTOFUPath -PathType Leaf) {
+	If (Test-Path -Path $env:PSGeminiTOFUPath -PathType Leaf)
+	{
 		Write-Debug "Found a certificate store at ${env:PSGeminiTOFUPath}."
 		$AllCerts = @()
-		Import-CSV -Path $env:PSGeminiTOFUPath | ForEach-Object {
-			If ($null -eq $HostName -or $HostName -In @('', $_.HostName)) {
+		Import-CSV -Path $env:PSGeminiTOFUPath | ForEach-Object -ScriptBlock
+		{
+			If ($null -eq $HostName  -or  $HostName -In @('', $_.HostName))
+			{
 				$NotAfter = [DateTime]::FromFileTimeUTC($_.ExpirationDate)
 				Write-Debug "In our store, we have a matching certificate for $($_.HostName), good until $NotAfter, fingerprint $($_.Fingerprint)."
 				$AllCerts += [PSCustomObject]@{
@@ -532,13 +597,15 @@ Function Get-PSGeminiKnownCertificate {
 		}
 		Return $AllCerts
 	}
-	Else {
+	Else
+	{
 		Write-Verbose "The certificate store ${env:PSGeminiTOFUPath} does not exist."
 		Return @()
 	}
 }
 
-Function Add-PSGeminiKnownCertificate {
+Function Add-PSGeminiKnownCertificate
+{
 	[CmdletBinding()]
 	[OutputType([Void])]
 	Param(
@@ -567,7 +634,8 @@ Function Add-PSGeminiKnownCertificate {
 	#Add-Content -Path $env:PSGeminiTOFUPath -Value "$HostName,$Fingerprint,$($ExpirationDate.ToFileTimeUTC())"
 }
 
-Function Remove-PSGeminiKnownCertificate {
+Function Remove-PSGeminiKnownCertificate
+{
 	[CmdletBinding(
 		SupportsShouldProcess, ConfirmImpact='Low',
 		DefaultParameterSetName='HostName'
@@ -585,28 +653,35 @@ Function Remove-PSGeminiKnownCertificate {
 
 	$env:PSGeminiTOFUPath ??= (Join-Path -Path $HOME -ChildPath '.PSGemini_known_hosts.csv')
 
-	If (-Not (Test-Path -Path $env:PSGeminiTOFUPath -PathType Leaf)) {
+	If (-Not (Test-Path -Path $env:PSGeminiTOFUPath -PathType Leaf))
+	{
 		Return $null
 	}
 
 	$AllCerts = Import-CSV -Path $env:PSGeminiTOFUPath
 	
-	If ($PSCmdlet.ParameterSetName -eq 'HostName') {
+	If ($PSCmdlet.ParameterSetName -eq 'HostName')
+	{
 		$FoundCert = $AllCerts | Where-Object HostName -eq $HostName | Select-Object -First 1
-		If ($null -eq $FoundCert) {
+		If ($null -eq $FoundCert)
+		{
 			Write-Warning "No certificate for $HostName was found."
 		}
-		}
-	ElseIf ($PSCmdlet.ParameterSetName -eq 'Fingerprint') {
+	}
+	ElseIf ($PSCmdlet.ParameterSetName -eq 'Fingerprint')
+	{
 		$FoundCert = $AllCerts | Where-Object Fingerprint -eq $Fingerprint | Select-Object -First 1
-		If ($null -eq $FoundCert) {
+		If ($null -eq $FoundCert)
+		{
 			Write-Warning "No certificate $Fingerprint was found."
 		}
 	}
 
-	If ($null -ne $FoundCert) {
+	If ($null -ne $FoundCert)
+	{
 		Write-Debug "Removing certificate for $($FoundCert.HostName):  expires=$([DateTime]::FromFileTimeUtc($FoundCert.ExpirationDate)), fingerprint=$($FoundCert.Fingerprint)"
-		If ($PSCmdlet.ShouldProcess($FoundCert.Fingerprint, 'Remove from TOFU store')) {
+		If ($PSCmdlet.ShouldProcess($FoundCert.Fingerprint, 'Remove from TOFU store'))
+		{
 			$AllCerts | Where-Object {$_ -ne $FoundCert} | Export-CSV -Path $env:PSGeminiTOFUPath -Force
 		}
 	}
