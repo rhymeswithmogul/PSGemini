@@ -1,11 +1,11 @@
 ---
 external help file: PSGemini-help.xml
 Module Name: PSGemini
-online version: https://github.com/rhymeswithmogul/PSGemini/blob/main/man/en-US/Get-PSGeminiKnownCertificates.md
+online version: https://github.com/rhymeswithmogul/PSGemini/blob/main/man/en-US/Get-PSGeminiKnownCertificate.md
 schema: 2.0.0
 ---
 
-# Get-PSGeminiKnownCertificates
+# Get-PSGeminiKnownCertificate
 
 ## SYNOPSIS
 Fetches one or more certificates from the PSGemini internal store.
@@ -13,7 +13,7 @@ Fetches one or more certificates from the PSGemini internal store.
 ## SYNTAX
 
 ```
-Get-PSGeminiKnownCertificates [[-HostName] <String>] [<CommonParameters>]
+Get-PSGeminiKnownCertificate [[-HostName] <String>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -25,7 +25,7 @@ Certificates are kept in the store until they are expired, at which point, they 
 
 ### Example 1
 ```powershell
-PS C:\> Get-PSGeminiKnownCertificates gemini.circumlunar.space | Format-List
+PS C:\> Get-PSGeminiKnownCertificate gemini.circumlunar.space | Format-List
 
 HostName       : gemini.circumlunar.space                                                           
 Fingerprint    : 04A89008021E8F7AD7C73498D9147CC1D1122858FDB02DE0D50F82491F8CAF7CD525A2B410A20871A6AC7DB75AF7A1CE04C2F6628378108F8D6AB38EB8748D79BD
@@ -37,7 +37,7 @@ Fetches the trusted certificate for the named domain.  (Piped to `Format-List` f
 ## PARAMETERS
 
 ### -HostName
-A host name.  If not provided, all certificates will be matched.  However, this parameter does not accept wildcards or [RegEx]s.
+{{ Fill HostName Description }}
 
 ```yaml
 Type: String

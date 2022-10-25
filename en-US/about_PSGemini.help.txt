@@ -2,60 +2,59 @@
     about_psgemini
 
 SHORT DESCRIPTION
-    Get resources with the Gemini protocol.
+    Get resources by using the Gemini protocol.
 
 LONG DESCRIPTION
-    PSGemini is a PowerShell module that was designed to access, view, download,
-    and interact with resources available over the Gemini protocol.  Made to be
+    PSGemini  is a PowerShell  module  designed to access, view, download,  and
+    interact with resources available over the Gemini protocol.  Designed to be
     "somewhere between Gopher and HTTP", Gemini is growing in popularity.  It's
     time it had a PowerShell module.
 
-    This module has a few cmdlets, but the biggest one is Invoke-GeminiRequest.
-    Modeled after Invoke-WebRequest, it can be used similarly.  The syntax and
+    This module has some cmdlets, but the important one is Invoke-GeminiRequest.
+    Modeled after `Invoke-WebRequest`, it can be used similarly. The syntax and
     output are similar.
 
 Certificate Trust
-    While the Gemini protocol requires TLS 1.2 or newer, it eschews the typical
-    CA-based certificate validation with a TOFU (trust on first use) model.  To
-    keep track of this, PSGemini saves found certificates to a file.  That file
-    is saved at ${env:PSGeminiTOFUPath}. If that is not defined, it defaults to
-    "${env:HOME}/.PSGemini_known_hosts.csv"
-
-    While strongly discouraged, if you've managed to find this conceptual help,
+    The Gemini protocol uses certificates in a  trust on first use (TOFU) model.
+    To keep track of this, PSGemini  saves found certificates to a file.   That
+    file is saved at $env:PSGeminiTOFUPath. If that is not defined, it defaults
+    defaults to `${env:HOME}/.PSGemini_known_hosts.csv`.
+    
+    While  strongly discouraged,  if you've managed to find  my conceptual help,
     you might be the type who wants to mess with the trust store. You can do so
     by using one of these cmdlets:
-     - Get-PSGeminiKnownCertificates
-     - Add-PSGeminiKnownCertificate
-     - Remove-PSGeminiKnownCertificate
+     -  Get-PSGeminiKnownCertificate
+     -  Add-PSGeminiKnownCertificate
+     -  Remove-PSGeminiKnownCertificate
 
-    Even more strongly discouraged:  you may open the file in a text editor, or
-    Excel, LibreOffice Calc, or your favorite CSV editor.
+    Even more strongly discouraged:  you may open the CSV file in a text editor,
+    Excel, LibreOffice Calc, or another app.
 
 Aliases (or, Why Not `igr`?)
-    You can use the aliases `Invoke-GemRequest` or `igemr`.  (Why not `igr`? 
-    That's already used by my other module, PSGopher.)
+    You can use the aliases Invoke-GemRequest or igemr.  (Why not `igr`?  That
+    is already used by my other module, PSGopher.  Fans of the small web might
+    have both installed.)
 
 Client Certificates
-    Client certificates are supported.  Use the `-Certificate` parameter to
-    specify one.  This has not been throughly tested.
+    Client certificates are supported.   Specify the -Certificate parameter to
+    use one.
 
 FavIcons
-    Why not have a little fun?  Someone made a draft RFC to bring something like
-    favicons to Gemini.   In the spirit of the protocol, we're not going to make
-    additional requests, so this is disabled by default. To request a resource's
-    favicon, as well as the regular content or file, pass the -FavIcon parameter
-    to Invoke-GeminiRequest.
+    Why not have a little fun? Someone made a draft RFC to bring something like
+    favicons to Gemini.  In the spirit of the protocol, we won't make any extra
+    requests, so this is disabled by default.   To request a resource's favicon,
+    use the `-FavIcon` parameter for `Invoke-GeminiRequest`.
 
 TLS 1.3 Support
-    This cmdlet supports TLS 1.3.  However, there may be issues using it with
-    PowerShell 7 on some platforms.  The Invoke-GeminiRequest cmdlet will make
-    a best effort to use TLS 1.3 before falling back to TLS 1.2.  Per the spec,
-    no older protocols may or will be tried.
+    This cmdlet does support TLS 1.3, but relies on the host to support it, too.
+    There may be issues using it with PowerShell 7 on some platforms.  hus, the
+    `Invoke-GeminiRequest` cmdlet will make a best effort to use TLS 1.3 before
+    falling back to TLS 1.2. Per the specification's intent, no older protocols
+    may or will be tried.
 
 EXAMPLES
     EXAMPLE 1: ACCESS RESOURCES
-
-    PS> Invoke-GeminiRequest gemini://gemini.circumlunar.space
+    PS C:\> Invoke-GeminiRequest gemini://gemini.circumlunar.space
     
     StatusCode        : 20
     StatusDescription : text/gemini
@@ -72,25 +71,26 @@ EXAMPLES
                         * Takes user privacy very seriously
     […]
 
-    EXAMPLE 2: DOWNLOAD RESOURCES
-    PS> Invoke-GeminiRequest gemini://colincogle.name/pgp/pgp.txt `
-      >    -OutFile pgp.txt
+    Connects to the Gemini server at gemini.circumlunar.space and returns the
+    result.
 
-    PS> Get-Item pgp.txt
+    EXAMPLE 2: DOWNLOAD RESOURCES
+    PS /Users/colin> Invoke-GeminiRequest gemini://colincogle.name/pgp.txt -OutFile pgp.txt
+    PS /Users/colin> Get-Item pgp.txt                            
     
         Directory: /Users/colin
     
-    UnixMode   User     Group          LastWriteTime           Size Name
-    --------   ----     -----          -------------           ---- ----
-    -rw-r--r-- colin    wheel          2/8/2022 08:05          5218 pgp.txt
+    UnixMode   User             Group        LastWriteTime        Size Name
+    --------   ----             -----        -------------        ---- ----
+    -rw-r--r-- colin            wheel        2/8/2022 08:05       5218 pgp.txt
+
+    You can use the `-OutFile` switch to download files from Gemspace.
 
 NOTE
-    The official Gemini protocol specification eschews the traditional CA-based
-    certificate validation with a simple TOFU (trust on first use) model.    To
+    The Gemini specification uses a TOFU model for remembering certificates. To
     keep track of this, PSGemini saves found certificates to a file.  That file
-    is saved at $env:PSGeminiTOFUPath.   If that is not defined, it defaults to
-    ${env:HOME}/.PSGemini_known_hosts.csv.  You may change the storage location
-    simply by defining the former environment variable.
+    is saved at $env:PSGeminiTOFUPath.   If that is not defined by the user, it
+    defaults to `${env:HOME}/.PSGemini_known_hosts.csv`.
 
 TROUBLESHOOTING NOTE
     Client certificates have not been fully tested. If you encounter any issues,
@@ -101,16 +101,16 @@ SEE ALSO
     => https://github.com/rhymeswithmogul/PSGemini
 
     If you'd like to know more about Gemini, check out its unofficial official
-    site at either
-     - https://gemini.circumlunar.space, or
-     - gemini://gemini.circumlunar.space
+    site at either:
+    => gemini://gemini.circumlunar.space, or
+    => https://gemini.circumlunar.space
 
     The Gemini protocol specification is here:
-    => https://gemini.circumlunar.space/docs/specification.gmi
+    => gemini://gemini.circumlunar.space/docs/specification.gmi
 
     If you like Web/WWW/HTTP alternatives, why not check out my other module:
-     - PSGopher: https://github.com/rhymeswithmogul/PSGopher
+    => PSGopher: https://github.com/rhymeswithmogul/PSGopher
 
 KEYWORDS
-    Gemini, Gemlog, Gemblog, Geminispace, Gemtext, SSL, TLS, PowerShell Core
-
+    Gemini, Gemlog, Gemblog, Geminispace, Gemtext, SSL, TLS, PowerShell Core,
+    the small web

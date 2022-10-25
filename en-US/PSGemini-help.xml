@@ -133,7 +133,7 @@
         <maml:uri>https://github.com/rhymeswithmogul/PSGemini/blob/main/man/en-US/Add-PSGeminiKnownCertificate.md</maml:uri>
       </maml:navigationLink>
       <maml:navigationLink>
-        <maml:linkText>Get-PSGeminiKnownCertificates</maml:linkText>
+        <maml:linkText>Get-PSGeminiKnownCertificate</maml:linkText>
         <maml:uri></maml:uri>
       </maml:navigationLink>
       <maml:navigationLink>
@@ -148,9 +148,9 @@
   </command:command>
   <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
     <command:details>
-      <command:name>Get-PSGeminiKnownCertificates</command:name>
+      <command:name>Get-PSGeminiKnownCertificate</command:name>
       <command:verb>Get</command:verb>
-      <command:noun>PSGeminiKnownCertificates</command:noun>
+      <command:noun>PSGeminiKnownCertificate</command:noun>
       <maml:description>
         <maml:para>Fetches one or more certificates from the PSGemini internal store.</maml:para>
       </maml:description>
@@ -161,11 +161,11 @@
     </maml:description>
     <command:syntax>
       <command:syntaxItem>
-        <maml:name>Get-PSGeminiKnownCertificates</maml:name>
+        <maml:name>Get-PSGeminiKnownCertificate</maml:name>
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="0" aliases="none">
           <maml:name>HostName</maml:name>
           <maml:description>
-            <maml:para>A host name.  If not provided, all certificates will be matched.  However, this parameter does not accept wildcards or [RegEx]s.</maml:para>
+            <maml:para>{{ Fill HostName Description }}</maml:para>
           </maml:description>
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
@@ -180,7 +180,7 @@
       <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="0" aliases="none">
         <maml:name>HostName</maml:name>
         <maml:description>
-          <maml:para>A host name.  If not provided, all certificates will be matched.  However, this parameter does not accept wildcards or [RegEx]s.</maml:para>
+          <maml:para>{{ Fill HostName Description }}</maml:para>
         </maml:description>
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
@@ -218,7 +218,7 @@
     <command:examples>
       <command:example>
         <maml:title>-------------------------- Example 1 --------------------------</maml:title>
-        <dev:code>PS C:\&gt; Get-PSGeminiKnownCertificates gemini.circumlunar.space | Format-List
+        <dev:code>PS C:\&gt; Get-PSGeminiKnownCertificate gemini.circumlunar.space | Format-List
 
 HostName       : gemini.circumlunar.space                                                           
 Fingerprint    : 04A89008021E8F7AD7C73498D9147CC1D1122858FDB02DE0D50F82491F8CAF7CD525A2B410A20871A6AC7DB75AF7A1CE04C2F6628378108F8D6AB38EB8748D79BD
@@ -231,7 +231,7 @@ ExpirationDate : 10/03/2025 09:50:37</dev:code>
     <command:relatedLinks>
       <maml:navigationLink>
         <maml:linkText>Online Version:</maml:linkText>
-        <maml:uri>https://github.com/rhymeswithmogul/PSGemini/blob/main/man/en-US/Get-PSGeminiKnownCertificates.md</maml:uri>
+        <maml:uri>https://github.com/rhymeswithmogul/PSGemini/blob/main/man/en-US/Get-PSGeminiKnownCertificate.md</maml:uri>
       </maml:navigationLink>
       <maml:navigationLink>
         <maml:linkText>Add-PSGeminiKnownCertificate</maml:linkText>
@@ -530,6 +530,28 @@ UnixMode   User             Group                 LastWriteTime           Size N
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="cf">
+          <maml:name>Confirm</maml:name>
+          <maml:description>
+            <maml:para>Prompts you for confirmation before running the cmdlet.</maml:para>
+          </maml:description>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="wi">
+          <maml:name>WhatIf</maml:name>
+          <maml:description>
+            <maml:para>Shows what would happen if the cmdlet runs. The cmdlet is not run.</maml:para>
+          </maml:description>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
+        </command:parameter>
       </command:syntaxItem>
       <command:syntaxItem>
         <maml:name>Remove-PSGeminiKnownCertificate</maml:name>
@@ -544,6 +566,28 @@ UnixMode   User             Group                 LastWriteTime           Size N
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="cf">
+          <maml:name>Confirm</maml:name>
+          <maml:description>
+            <maml:para>Prompts you for confirmation before running the cmdlet.</maml:para>
+          </maml:description>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="wi">
+          <maml:name>WhatIf</maml:name>
+          <maml:description>
+            <maml:para>Shows what would happen if the cmdlet runs. The cmdlet is not run.</maml:para>
+          </maml:description>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
         </command:parameter>
       </command:syntaxItem>
     </command:syntax>
@@ -571,6 +615,30 @@ UnixMode   User             Group                 LastWriteTime           Size N
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="cf">
+        <maml:name>Confirm</maml:name>
+        <maml:description>
+          <maml:para>Prompts you for confirmation before running the cmdlet.</maml:para>
+        </maml:description>
+        <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+        <dev:type>
+          <maml:name>SwitchParameter</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>False</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="wi">
+        <maml:name>WhatIf</maml:name>
+        <maml:description>
+          <maml:para>Shows what would happen if the cmdlet runs. The cmdlet is not run.</maml:para>
+        </maml:description>
+        <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+        <dev:type>
+          <maml:name>SwitchParameter</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>False</dev:defaultValue>
       </command:parameter>
     </command:parameters>
     <command:inputTypes>
@@ -624,7 +692,7 @@ UnixMode   User             Group                 LastWriteTime           Size N
         <maml:uri></maml:uri>
       </maml:navigationLink>
       <maml:navigationLink>
-        <maml:linkText>Get-PSGeminiKnownCertificates</maml:linkText>
+        <maml:linkText>Get-PSGeminiKnownCertificate</maml:linkText>
         <maml:uri></maml:uri>
       </maml:navigationLink>
       <maml:navigationLink>

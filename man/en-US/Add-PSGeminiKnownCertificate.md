@@ -98,6 +98,6 @@ This cmdlet is supposed to be run internally.  Calling this cmdlet manually is S
 
 ## RELATED LINKS
 
-[Get-PSGeminiKnownCertificates]()
+[Get-PSGeminiKnownCertificate]()
 [Remove-PSGeminiKnownCertificate]()
 [Invoke-GeminiRequest]()
