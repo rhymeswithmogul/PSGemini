@@ -61,7 +61,7 @@ PowerShellVersion = '7.1'
 FunctionsToExport = @(
 	'Invoke-GeminiRequest',
 	'Add-PSGeminiKnownCertificate',
-	'Get-PSGeminiKnownCertificates',
+	'Get-PSGeminiKnownCertificate',
 	'Remove-PSGeminiKnownCertificate'
 )
 
@@ -73,7 +73,7 @@ VariablesToExport = ''
 
 # Aliases to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no aliases to export.
 AliasesToExport = @(
-	'Get-PSGeminiKnownCertificate',
+	'Get-PSGeminiKnownCertificates',
 	'igemr',
 	'Invoke-GemRequest'
 )
@@ -117,7 +117,7 @@ PrivateData = @{
 
 		# ReleaseNotes of this module
 		ReleaseNotes = 'Tiny bug fix.'
-		
+
 		# Prerelease string of this module
 		#Prerelease = ''
 

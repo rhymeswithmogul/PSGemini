@@ -504,9 +504,9 @@ Function Invoke-GeminiRequest {
 	#endregion
 }
 
-Function Get-PSGeminiKnownCertificates {
+Function Get-PSGeminiKnownCertificate {
 	[CmdletBinding()]
-	[Alias('Get-PSGeminiKnownCertificate')]
+	[Alias('Get-PSGeminiKnownCertificates')]
 	[OutputType([PSCustomObject[]])]
 	Param(
 		[AllowNull()]
