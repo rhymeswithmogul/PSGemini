@@ -18,7 +18,7 @@ Certificate Trust
     The Gemini protocol uses certificates in a  trust on first use (TOFU) model.
     To keep track of this, PSGemini  saves found certificates to a file.   That
     file is saved at $env:PSGeminiTOFUPath. If that is not defined, it defaults
-    defaults to `${env:HOME}/.PSGemini_known_hosts.csv`.
+    to `${env:HOME}/.PSGemini_known_hosts.csv`.
     
     While  strongly discouraged,  if you've managed to find  my conceptual help,
     you might be the type who wants to mess with the trust store. You can do so
