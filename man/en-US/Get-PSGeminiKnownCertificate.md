@@ -72,3 +72,4 @@ The PSGemini certificate store is saved in ~/.PSGemini_known_hosts.csv.  You may
 [Add-PSGeminiKnownCertificate]()
 [Remove-PSGeminiKnownCertificate]()
 [Invoke-GeminiRequest]()
+[about_ProjectGemini]()

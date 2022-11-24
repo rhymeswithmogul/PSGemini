@@ -1,7 +1,7 @@
 # PSGemini ChangeLog
 
-## Not yet released
-*  Included the Project Gemini Speculative Speculation as some extra reading material (`Get-Help about_ProjectGemini`).  The original has British English spellings, so why not?  Now we have a localization/localisation.
+## Version 1.0.6
+Included the Project Gemini Speculative Speculation as some extra reading material (`Get-Help about_ProjectGemini`).  The original has British English spellings, so why not?  Now we have a localization/localisation.
 
 ## Version 1.0.5
 Code cleanup.

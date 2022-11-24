@@ -101,3 +101,4 @@ This cmdlet is supposed to be run internally.  Calling this cmdlet manually is S
 [Get-PSGeminiKnownCertificate]()
 [Remove-PSGeminiKnownCertificate]()
 [Invoke-GeminiRequest]()
+[about_ProjectGemini]()

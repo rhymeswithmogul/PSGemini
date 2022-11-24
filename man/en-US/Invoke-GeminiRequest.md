@@ -181,7 +181,7 @@ When using the `-OutFile` parameter or parameter set, no output will be generate
 Client certificate checking has not been fully tested yet.
 
 ## RELATED LINKS
-
 [Get-PSGeminiKnownCertificate]()
 [Invoke-WebRequest]()
 [Invoke-GopherRequest]()
+[about_PSGemini]()
