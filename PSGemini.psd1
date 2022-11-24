@@ -86,6 +86,8 @@ ModuleList = @()
 
 # List of all files packaged with this module
 FileList = @(
+	'en-UK/about_ProjectGemini.help.txt',
+	'en-US/about_ProjectGemini.help.txt',
 	'en-US/about_PSGemini.help.txt',
 	'en-US/PSGemini-help.xml',
 	'src/PSGemini.psm1',
