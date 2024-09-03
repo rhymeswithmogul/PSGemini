@@ -215,6 +215,8 @@ Function Invoke-GeminiRequest
 				$Uri
 			)
 			$er.CategoryInfo.Activity = 'ParseResponseHeader'
+			$er.ErrorDetails = 'An unspecified condition exists on the server that is preventing the content from being served.  You may try again.'
+			$er.FullyQualifiedErrorId = 'PSGemini.GeminiProtocol.40'
 			$PSCmdlet.WriteError($er)
 			Return $null
 		}
@@ -228,6 +230,8 @@ Function Invoke-GeminiRequest
 				$Uri
 			)
 			$er.CategoryInfo.Activity = 'ParseResponseHeader'
+			$er.ErrorDetails = 'The server is unavailable due to overload or maintenance.  You should try again later.'
+			$er.FullyQualifiedErrorId = 'PSGemini.GeminiProtocol.41'
 			$PSCmdlet.WriteError($er)
 			Return $null
 		}
@@ -241,7 +245,10 @@ Function Invoke-GeminiRequest
 				$Uri
 			)
 			$er.CategoryInfo.Activity = 'ParseResponseHeader'
+			$er.ErrorDetails = 'A CGI process on the server died unexpectedly or timed out.  You may try again.'
+			$er.FullyQualifiedErrorId = 'PSGemini.GeminiProtocol.42'
 			$PSCmdlet.WriteError($er)
+			
 			Return $null
 		}
 
@@ -254,6 +261,8 @@ Function Invoke-GeminiRequest
 				$Uri
 			)
 			$er.CategoryInfo.Activity = 'ParseResponseHeader'
+			$er.ErrorDetails = 'A proxy request failed because the server was unable to successfully complete a transaction with the remote host.  You may try again.'
+			$er.FullyQualifiedErrorId = 'PSGemini.GeminiProtocol.43'
 			$PSCmdlet.WriteError($er)
 			Return $null
 		}
@@ -277,6 +286,8 @@ Function Invoke-GeminiRequest
 				$Uri
 			)
 			$er.CategoryInfo.Activity = 'ParseResponseHeader'
+			$er.ErrorDetails = 'Sorry, something went wrong (on the server side).  Please try again later.'
+			$er.FullyQualifiedErrorId = 'PSGemini.GeminiProtocol.50'
 			$PSCmdlet.WriteError($er)
 			Return $null
 		}
@@ -290,6 +301,8 @@ Function Invoke-GeminiRequest
 				$Uri
 			)
 			$er.CategoryInfo.Activity = 'ParseResponseHeader'
+			$er.ErrorDetails = 'The requested resource could not be found.  Check the link you followed, and try again later.'
+			$er.FullyQualifiedErrorId = 'PSGemini.GeminiProtocol.51'
 			$PSCmdlet.WriteError($er)
 			Return $null
 		}
@@ -303,6 +316,8 @@ Function Invoke-GeminiRequest
 				$Uri
 			)
 			$er.CategoryInfo.Activity = 'ParseResponseHeader'
+			$er.ErrorDetails = 'The requested resource is gone forever.'
+			$er.FullyQualifiedErrorId = 'PSGemini.GeminiProtocol.52'
 			$PSCmdlet.WriteError($er)
 			Return $null
 		}
@@ -316,6 +331,8 @@ Function Invoke-GeminiRequest
 				$Uri
 			)
 			$er.CategoryInfo.Activity = 'ParseResponseHeader'
+			$er.ErrorDetails = 'The request was for a resource at a domain not served by the server and the server does not accept proxy requests.  Please do not use this server as a proxy.'
+			$er.FullyQualifiedErrorId = 'PSGemini.GeminiProtocol.53'
 			$PSCmdlet.WriteError($er)
 			Return $null
 		}
@@ -329,6 +346,8 @@ Function Invoke-GeminiRequest
 				$Uri
 			)
 			$er.CategoryInfo.Activity = 'ParseResponseHeader'
+			$er.ErrorDetails = 'The server was unable to parse your request, presumably due to a malformed request, or the request violated the contraints listed in the Request section.  Please change your request and try again.'
+			$er.FullyQualifiedErrorId = 'PSGemini.GeminiProtocol.59'
 			$PSCmdlet.WriteError($er)
 			Return $null
 		}
@@ -342,6 +361,8 @@ Function Invoke-GeminiRequest
 				$Uri
 			)
 			$er.CategoryInfo.Activity = 'ParseResponseHeader'
+			$er.ErrorDetails = 'The content requires a client certificate.  You must provide a certificate in order to access the content, and should not repeat the request without one.'
+			$er.FullyQualifiedErrorId = 'PSGemini.GeminiProtocol.60'
 			$PSCmdlet.WriteError($er)
 			Return $null
 		}
@@ -355,6 +376,8 @@ Function Invoke-GeminiRequest
 				$Uri
 			)
 			$er.CategoryInfo.Activity = 'ParseResponseHeader'
+			$er.ErrorDetails = 'The supplied client certificate is not authorized for accessing this particular requested resource. The problem is not with the certificate itself, which may be authorized for other resources.  Select another certificate and try again.'
+			$er.FullyQualifiedErrorId = 'PSGemini.GeminiProtocol.61'
 			$PSCmdlet.WriteError($er)
 			Return $null
 		}
@@ -368,6 +391,8 @@ Function Invoke-GeminiRequest
 				$Uri
 			)
 			$er.CategoryInfo.Activity = 'ParseResponseHeader'
+			$er.ErrorDetails = "The supplied client certificate was not accepted because it is not valid. This indicates a problem with the certificate in and of itself, with no consideration of the particular requested resource. The most likely cause is that the certificate's validity start date is in the future or its expiry date has passed, but this code may also indicate an invalid signature, or a violation of X.509 standard requirements."
+			$er.FullyQualifiedErrorId = 'PSGemini.GeminiProtocol.62'
 			$PSCmdlet.WriteError($er)
 			Return $null
 		}
@@ -380,6 +405,7 @@ Function Invoke-GeminiRequest
 				$Uri
 			)
 			$er.CategoryInfo.Activity = 'ParseResponseHeader'
+			$er.ErrorDetails = 'The server sent an undefined status code.  Please check its response for more information.'
 			$PSCmdlet.WriteError($er)
 			Return $null
 		}
