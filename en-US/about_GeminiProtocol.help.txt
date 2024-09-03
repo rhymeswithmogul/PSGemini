@@ -1,0 +1,737 @@
+TOPIC
+    about_ProjectGemini
+
+SHORT DESCRIPTION
+    Project Gemini (also known as the Gemini Protocol) is a client-server
+    communications protocol that is deigned to be simple. 
+
+ABOUT THIS HELP
+    This conceptual help article contains everything you need to know about
+    Gemini itself.  This was written by "Solderpunk", and I have chosen to
+    include it with the PSGemini PowerShell module as an educational resource.
+    It has been edited for formatting.
+
+PROJECT GEMINI SPECULATIVE SPECIFICATION
+    Version 0.24.1 (August 28, 2024)
+
+    This document is placed in the public domain under the Creative Commons CC0
+    1.0 Universal Public Domain Dedication.
+
+    # Abstract
+
+    This document specifies the Gemini protocol for file transfer.  It can be
+    thought of as an incremental improvement over Gopher [RFC1436] rather than
+    a stripped down HTTP [RFC7230].  It runs over TCP [STD7] port 1965 with en-
+    cryption provided by TLS [RFC8446] with a simple request and response trans-
+    action.  It can serve arbitrary digital content with a specific MIME type
+    [RFC2045], but is most frequently used to serve lightweight hypertext docu-
+    ments which use a related by separately specified format:
+
+    See also the Gemini hypertext format, aka "gemtext", specification
+
+    # Conventions used in this document
+
+    The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
+    "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to
+    be interpreted as described in [BCP14].
+
+    # Overview
+
+    An overriding goal of Gemini is to provide a simple protocol that is easy to
+    implement (requiring a day or two of effort and only a few hundred lines for
+    a server or a client) while still being useful.
+
+    Gemini is served over TCP on port 1965 by default (the first manned Gemini
+    mission, Gemini 3, flew in March 1965), using TLS to provide an encrypted
+    transaction.  Servers and clients MUST support TLS 1.2 or higher.  The type
+    of TLS certificate used (CA-based or self-signed) is specified in a "best
+    practices" document as details are still being discussed.  The default port
+    of 1965 is an unpriviledged port on most systems, so the use of an
+    administrative account is not required to run the service.
+
+    Addressing in Gemini is based on URIs [STD66], with the following
+    modifications:
+
+    1. the scheme used is "gemini";
+    2. the userinfo portion of a URI MUST NOT be used;
+    3. a empty path component and a path component of "/" are equivalent and
+       servers MUST support both without sending a redirection;
+    4. the port defaults to 1965 if not specified;
+    5. the use of an IP address in the authority section SHOULD NOT be used.
+
+    While this document just covers the protocol with some mandates for what
+    clients and servers have to do, there are other aspects of Gemini that are
+    not covered here in the specification which fall outside the core protocol.
+    Implementors of both clients and servers are RECOMMENDED to follow the best
+    practice guide for the Gemini protocol.
+
+    # Requests
+
+    The client connects to the server and sends a request which consists of an
+    absolute URI followed by a CR (character 13) and LF (character 10).
+    The augmented BNF [STD68] for this is:
+
+    ```
+        request = absolute-URI CRLF
+
+        ; absolute-URI from [STD66]
+        ; CRLF         from [STD68]
+    ```
+
+    When making a request, the URI MUST NOT exceed 1024 bytes, and a server MUST
+    reject requests where the URI exceeds this limit.  A server MUST reject a
+    request with a userinfo portion. Clients MUST NOT send a fragment as part of
+    the request, and a server MUST reject such requests as well.  If a client is
+    making a request with an empty path, the client SHOULD add a trailing '/' to
+    the request, but a server MUST be able to deal with an empty path.
+
+    # Responses
+
+    Upon receiving a request, the server will send back a response header.  In
+    the case of a successful request, the header is followed by the content re-
+    quested by the client.  Response headers MUST be UTF-8 encoded text and MUST
+    NOT begin with the Byte Order Mark U+FEFF.  A response header consists of a
+    two digit status code, possibly followed some additional information (which
+    depends upon the response being sent), always followed by a CR and LF.
+    The augmented BNF:
+
+    ```
+        reply    = input / success / redirect / tempfail / permfail / auth
+
+        input    = "1" DIGIT SP prompt        CRLF
+        success  = "2" DIGIT SP mimetype      CRLF body
+        redirect = "3" DIGIT SP URI-reference CRLF
+                        ; NOTE: [STD66] allows "" as a valid
+                        ;       URI-reference.  This is not intended to
+                        ;       be valid for cases of redirection.
+        tempfail = "4" DIGIT [SP errormsg]    CRLF
+        permfail = "5" DIGIT [SP errormsg]    CRLF
+        auth     = "6" DIGIT [SP errormsg]    CRLF
+
+        prompt   = 1*(SP / VCHAR)
+        mimetype = type "/" subtype *(";" parameter)
+        errormsg = 1*(SP / VCHAR)
+        body     = *OCTET
+
+        VCHAR    =/ UTF8-2v / UTF8-3 / UTF8-4
+        UTF8-2v  = %xC2 %xA0-BF UTF8-tail ; no C1 control set
+                / %xC3-DF UTF8-tail
+
+    ; URI-reference from [STD66]
+    ;
+    ; type          from [RFC2045]
+    ; subtype       from [RFC2045]
+    ; parameter     from [RFC2045]
+    ;
+    ; CRLF          from [STD68]
+    ; DIGIT         from [STD68]
+    ; SP            from [STD68]
+    ; VCHAR         from [STD68]
+    ; OCTET         from [STD68]
+    ; WSP           from [STD68]
+    ;
+    ; UTF8-3        from [STD63]
+    ; UTF8-4        from [STD63]
+    ; UTF8-tail     from [STD63]
+    ```
+
+    The VCHAR rule from [STD68] is extended to include the noncontrol codepoints
+    from Unicode (and encoded as UTF-8 [STD63]).
+
+    The body is unspecified here, as the contents depend upon the MIME type of
+    the content being served.  However, when the MIME type of the content is any 
+    ubset of "text" (including "text/gemini") and the content has been encoded
+    with any Unicode encoding, the body SHOULD NOT begin with an encoding of the
+    Byte Order Mark U+FEFF.   The encoding used, including byte order, should
+    instead be communicated to the client through use of the "charset" parameter
+    in the response header.  If a body declared to be of type "text/gemini"
+    begins with a Byte Order Mark, clients SHOULD ignore the mark when parsing
+    the document.
+
+    Upon sending the complete response (which may include content), the server
+    closes the connection and MUST use the TLS close_notify mechanism to inform
+    the client that no more data will be sent.
+
+    The status values range from 10 to 69 inclusive, although not all values are
+    currently defined.  They are grouped such that a client MAY use the initial
+    digit to handle the response, but the additional digit is there to further
+    clarify the status,  nd it is RECOMMENDED that clients use the addtional
+    digit when deciding what to do.  Servers MUST NOT send status codes that
+    are not defined.
+
+    # Status codes
+
+    There are six groups of status codes:
+
+    * 10-19	Input expected
+    * 20-29	Success
+    * 30-39	Redirection
+    * 40-49	Temporary failure
+    * 50-59	Permanent failure
+    * 60-69	Client certifiates
+
+    A client MUST reject any status code less than '10' and greater than '69'
+    and warn the user of such.  A client SHOULD deal with undefined status codes
+    between '10' and '69' per the default action of the initial digit.  So, a
+    status of '14' should be acted upon as if the client received a '10'; a sta-
+    tus of '22' should be acted upon as if the client received a '20'.
+
+    ## Input expected
+
+    The server is expecting user input from the client.  The additional informa-
+    tion sent after the status code is the text that a client MUST use to prompt
+    the user for the information.  If the requested information is provided, the
+    client should make a subsequent request for the same URI with the user input
+    included as the query portion.  Spaces in the user input MUST be encoded as
+    '%20'.  Clients MAY allow for the entry of input composed of multiple lines
+    and in such cases the linebreaks in the user input SHOULD be encoded as
+    '%0A', while servers SHOULD recognize both '%0A' and '%0D%0A' as linebreaks.
+    There are currently two status codes defined under this category.
+
+    ```
+        input  = "1" DIGIT SP prompt CRLF
+        prompt = 1*(SP / VCHAR)
+    ```
+
+    If a client receives a 1x response to a URI that already contains a query
+    string, the client MUST replace the query string with the user input.
+    For example, if the given URI results in a 10 response:
+
+    ```
+        gemini://example.net/search?hello
+    ```
+
+    The client will send as a request:
+
+    ```
+        gemini://example.net/search?the%20user%20input
+    ```
+
+    ### Status 10
+
+    The basic input status code.  A client MUST prompt a user for input, it
+    should be URI-encoded per [STD66] and sent as a query to the same URI that
+    generated this response.
+
+    ### Status 11---sensitive input
+
+    As per status code 10, but for use with sensitive input such as passwords.
+    Clients should present the prompt as per status code 10, but the user's
+    input should not be echoed to the screen to prevent it being read by
+    "shoulder surfers".
+
+    ## Success
+
+    The request was handled and the server has content to send to the client.
+    The additional information is the MIME type of the content, specified per
+    [RFC2045].  Client MUST deal with MIME parameters that are not understood
+    by simply ignoring them.
+
+    Response bodies are just raw content, text or binary, like with gopher
+    [RFC1436].  There is no support for compression, chunking or any other kind
+    of content or transfer encoding.  The server closes the connection after the
+    final byte, there is no "end of response" signal.
+
+    Internet media types are registered with a canonical form. Content transfer-
+    red via Gemini MUST be represented in the appropriate canonical form prior
+    to its transmission except for "text" types, as defined in the next
+    paragraph.
+
+    When in canonical form, media subtypes of the "text" type use CRLF as the
+    text line break.  Gemini relaxes this requirement and allows the transport
+    of text media with plain LF alone (but NOT a plain CR alone) representing a
+    line break when it is done consistently for an entire response body.  Gemini
+    clients MUST accept CRLF and bare LF as being representative of a line break
+    in text media received via Gemini.
+
+    Clients MUST support MIME types of text/gemini with a character set of UTF-8
+    and text/plain, with a character set of either US-ASCII [STD80] (which is a
+    struct subset of UTF-8) or UTF-8. A client MAY support text/plain with other
+    character sets.  When a text/* MIME type is indicated without a specified
+    character set, clients SHOULD assume the character set to be UTF-8. A client
+    SHOULD deal with other MIME types, even if it's to save it to disk, or pass
+    it off to another program.
+
+    The specification for text/gemini is given in the text/gemini specification.
+
+    The only defined status under this group is 20.
+
+    ```
+        success  = "2" DIGIT SP mimetype CRLF body
+        mimetype = type "/" subtype *(";" parameter)
+        body     = *OCTET
+    ```
+
+    ### Status 20
+
+    The server has successfully parsed and understood the request, and will
+    serve up content of the given MIME type.
+
+    ## Redirection
+
+    The server is sending the client a new location where the content is
+    located.  The additional information is an absolute or relative URI.  If
+    a server sends a redirection in response to a request with a query string,
+    the client MUST NOT apply the query string to the new location; if the query
+    string is important to the new location, the server MAY include the query as
+    part of the redirection.  A server SHOULD NOT include fragments in redirec-
+    tions, but if one is given, and a client already has a fragment it could
+    apply (from the original URI), it is up to the client which fragment to
+    apply.  Client MUST limit the number of redirections they follow to five
+    redirections.  There are two defined status code in this category.
+
+    ```
+        redirect = "3" DIGIT SP URI-reference CRLF
+                            ; NOTE: RFC-3987/3987 allow "" as a valid
+                            ;       URI-reference.  This is not intended to
+                            ;       be valid for cases of redirection.
+    ```
+
+    ### Status 30---temporary redirection
+
+    The basic redirection code.  The redirection is temporary and the client
+    should continue to request the content with the original URI.
+
+    ### Status 31---permanent redirection
+
+    The location of the content has moved permanently to a new location, and
+    clients SHOULD use the new location to retrieve the given content from then
+    on.
+
+    ## Temporary failure
+
+    The request has failed. There is no response body. The nature of the failure
+    is temporary, i.e. an identical request MAY succeed in the future.  Clients
+    SHOULD display a localized description of the failure to the user, based on
+    either the specific status code or the "temporary failure" group.  The
+    optional message MAY provide additional information on the failure and, if
+    given, a client SHOULD display it to the user.  There are five status codes
+    under this category.
+
+    ```
+            tempfail = "4" DIGIT [SP errormsg] CRLF
+        errormsg = 1*(SP / VCHAR)
+    ```
+
+    ### Status 40
+
+    An unspecified condition exists on the server that is preventing the content
+    from being served, but a client can try again to obtain the content.
+
+    ### Status 41---server unavailable
+
+    The server is unavailable due to overload or maintenance.  (cf HTTP 503)
+
+    ### Status 42---CGI error
+
+    A CGI process, or similar system for generating dynamic content, died
+    unexpectedly or timed out.
+
+    ### Status 43---proxy error
+
+    A proxy request failed because the server was unable to successfully
+    complete a transaction with the remote host.  (cf HTTP 502, 504)
+
+    ### Status 44---slow down
+
+    The server is requesting the client to slow down requests, and SHOULD use an
+    exponential back off, where subsequent delays between requests are doubled
+    until this status no longer returned.
+
+    ## Permanent failure
+
+    The request has failed.  There is no response body.  The nature of the
+    failure is permanent, i.e. identical requests will return the same status
+    and a client SHOULD NOT such requests.  Clients SHOULD display a localized
+    description of the failure to the user, based on either the specific status
+    code or the "permanent failure" group.   The optional message MAY provide
+    additional information on the failure and, if given, a client SHOULD display
+    it to the user.  There are four status codes under this category.
+
+    ```
+        permfail = "5" DIGIT [SP errormsg] CRLF
+        errormsg = 1*(SP / VCHAR)
+    ```
+
+    ### Status 50
+
+    This is the general permanent failure code.
+
+    ### Status 51---not found
+
+    The requested resource could not be found (you can't find things at Area 51)
+    and no further information is available.  It may exist in the future, it may
+    not.  Who knows? (cf HTTP 404)
+
+    ### Status 52---gone
+
+    The resource requested is no longer available and will not be available
+    again.  Search engines and similar tools should remove this resource from
+    their indices.  Content aggregators should stop requesting the resource and
+    convey to their human users that the subscribed resource is gone.
+    (cf HTTP 410)
+
+    ### Status 53---proxy request refused
+
+    The request was for a resource at a domain not served by the server and the
+    server does not accept proxy requests.
+
+    ### Status 59---bad request
+
+    The server was unable to parse the client's request, presumably due to a
+    malformed request, or the request violated the contraints listed in the
+    Request section.
+
+    ## Client certificates
+
+    The requested resource requires a client certificate to access, e.g. for
+    reasons of access control or to facilitate maintaining server-side state in
+    an application.  If the request was made without a certificate, it should be
+    repeated with one.  If the request was made with a certificate, the server
+    did not accept it and the request should be repeated with a different certi-
+    ficate.  The additional information may contain more details about why the
+    certificate was required, or rejected; servers SHOULD include such informa-
+    tion, and clients SHOULD display it to the user.  There are three status
+    codes defined for this category.
+
+    ```
+        auth     = "6" DIGIT [SP errormsg] CRLF
+        errormsg = 1*(SP / VCHAR)
+    ```
+
+    ### Status 60
+
+    The content requires a client certificate.  The client MUST provide a certi-
+    ficate in order to access the content and SHOULD NOT repeat the request
+    without one.  The scope of a certificate generated in response to this
+    status code should is limited to the host and port from which the status
+    code was received and the path of the URL in the original request plus all
+    paths below it. A server MAY require a different certificate for a different
+    path on the same host and port.  A server SHOULD allow the same certificate
+    to be used for any content along the given path.  Examples:
+
+    ```
+        gemini://example.com/private/       -- requires certificate A
+        gemini://example.com/private/r1     -- requires certificate A
+        gemini://example.com/private/r2/r3  -- requires certificate A
+        gemini://example.com/other/         -- requires certificate B
+        gemini://example.com/other/r1       -- requires certificate B
+        gemini://example.com/other/r2/r3    -- requires certificate B
+        gemini://example.com/random         -- no certificate required
+    ```
+
+    Clients MUST NOT automatically generate a client certificate and use it to
+    repeat the request without the active involvement of the user.  Clients MUST
+    NOT use a client certificate generated in response to this status code for a
+    request to a different host, a different port, or a path on the same host
+    and port which is above the the path of the URL in the original request
+    unless directed to do so by the user.
+
+    ### Status 61---certificate not authorized
+
+    The supplied client certificate is not authorized for accessing the particu-
+    lar requested resource.  The problem is not with the certificate itself,
+    which may be authorized for other resources.
+
+    ### Status 62---certificate not valid
+
+    The supplied client certificate was not accepted because it is not valid.
+    This indicates a problem with the certificate in and of itself, with no
+    consideration of the particular requested resource.  The most likely cause
+    is that the certificate's validity start date is in the future or its expiry
+    date has passed, but this code may also indicate an invalid signature, or a
+    violation of a X.509 standard requirements.
+
+    # The use of TLS
+
+    ## Minimum version requirements
+
+    At the time of writing (2021), not all existing TLS libraries support
+    TLS 1.3, but a majority (all?) do support TLS 1.2, thus TLS 1.2 is the min-
+    imum required version.  Implementors should be aware that TLS 1.2 will end
+    the server name and the client certificate (if used) in the clear as part of
+    the encryption negotiation phase of the protocol.  A client MAY warn a user
+    if a TLS 1.2 connection is established, and SHOULD warn the user when a
+    client certifiate will be transmitted via TLS 1.2.
+
+    ## Closing connections
+
+    Gemini servers MUST use the TLS close_notify implementation to close the
+    connection.  Clients SHOULD NOT close a connection by default, but MAY in
+    case the content exceeds constraints set by the user.  Both clients and
+    servers SHOULD handle the case when the TLS close_notify mechanism is not
+    used (such as a low level socket error that closes the socket without prop-
+    erly terminating the TLS connection).  A client SHOULD notify the user of
+    such a case; the server MAY log such a case.
+
+    ## Server Name Indication
+
+    Client and server implementations MUST support TLS SNI (Server Name Indica-
+    tion) and clients MUST include hostname information when making requests for
+    URLs where the authority section is a hostname.  If requesting a URL where
+    the authority section is an IP address (contrary to recommendation 5. in the
+    overview), clients SHOULD omit SNI information rather than setting it to an
+    empty value.
+
+    ## TLS Server certificate validation
+
+    The Gemini protocol specification does not dictate a particular method which
+    clients must use for validating receied server certificates.  Gemini imple-
+    mentations have experimented informally since the protocol's origin with
+    "alternative" validation schemes other than the widely used approach of
+    relying on a list of pre-trusted Certificate Authorities supplied with the
+    operating system and/or web browser.  Formal specifications of such appro-
+    aches may evolve out of solidifing practices.
+
+    Clients are strongly RECOMMENDED to use a Trust on First Use or "TOFU" cer-
+    tificate-pinning system, which does not reject self-signed certificates as
+    invalid, as the basis of their validation system.  Under such an system, the
+    first time a Gemini client connects to a server, it accepts whichever certi-
+    ficate it is presented.  That certificate's fingerprint and expiry date are
+    saved in a persistent database, associated with the server's hostname and
+    port.  On all subsequent connections to the same hostname on the same port,
+    the received certificate's fingerprint is computed and compared against the
+    one stored in the database.  If the fingerprints do not match but the previ-
+    ous certificate's expiry date has not passed, this is considered potential
+    evidence of a Man-In-The-Middle attack.  Clients MAY augment this basic sys-
+    tem with additional security measures, e.g. comparing certificates received
+    from multiple network perspectives and/or using DNS-Based Authentication of
+    Named Entities (DANE) [RFC6698].
+
+    # Intermediaries (proxies)
+
+    ## Overview, rationale
+
+    Gemini clients wanting to request a resource are typically expected to send
+    the appropriate request to the server(s) indicated by the authority compo-
+    nent of the resource's gemini:// URL.  However, a client MAY be configured
+    instead to send the request to an intermediary server which will connect to
+    the origin server on its behalf and relay the response.  Such intermediaries
+    (hereafter "proxies") may themselves use other proxies, forming a proxy
+    chain between a user agent and an origin server.
+
+    Gemini proxies can provide utility services including but not limited to:
+
+    * Protocol translation, e.g a Gemini proxy may accept requests for gopher://
+      URLs, fetching content by speaking the Gopher protocol over port 70,
+      translating the response from a Gopher menu into a text/gemini document
+      and then forwarding that response to a user agent.
+    * Archiving, e.g. a Gemini proxy may store a local copy of successfully
+      retrieved remote resources, and return these copies in future if a con-
+      nection to the origin host is not possible (because it or the proxy is
+      offline).
+    * Sharing configuration across devices, e.g. a Gemini proxy may be config-
+      ured to connect to certain remote hosts using a client certificate which
+      allows access to certain resources.  Gemini clients on the same local net-
+      work can then use the proxy to access those resources without needing to
+      have the client certificate and associated key installed.  Note that a
+      proxy used for this purpose must be the last in any proxy chain.
+
+    There is nothing special at the protocol level about Gemini proxies. Clients
+    connect to them, send requests and interpret responses in exactly the same
+    way they connect to "normal" Gemini servers as detailed above. Indeed, every
+    Gemini proxy is also a Gemini server (but not every server is a proxy).  The
+    distinguishing characteristic of a Gemini proxy is that it handles requests
+    for resources which "do not belong to them".  A proxy does not need to ex-
+    clusively handle such requests. The same program running on the same machine
+    may act as a proxy in responding to some requests but may not in responding
+    to others.
+
+    ## Error reporting
+
+    If a Gemini proxy connects to an origin server and completes a standard Ge-
+    mini request and response transaction, and the status code of the response
+    received from the origin server is an error code (i.e. it has an initial
+    digit of 4 or 5) then the proxy SHOULD send that same response header to the
+    user agent.
+
+    The status code 43, "proxy error", is intended for use in cases where a Ge-
+    mini proxy was unable to successfully complete a transaction with a remote
+    host.  The meaning of "successful" here is NOT receiving a response header
+    with a status code of 20, "success".  Rather, a proxy should return a
+    response with status code 43 in situations including but not limited to:
+
+    * The proxy attempted to connect to an origin server but the connection was
+      refused or timed out.
+    * The proxy connected to an origin server and sent the request but origin
+      server's response was malformed.
+    * The proxy connected to an origin server but did not trust the presented
+      TLS certificate.
+    * An internal error occurred in the proxy server software.
+
+    A proxy MAY also use status code 43 after completing a Gemini transaction
+    with an origin server and receiving a request for a client certificate, if
+    the proxy has not previously been configured with a client certificate and
+    associated private key to use for the relevant resource.  There is no
+    straightforward in-band way for the user agent to generate these and pass
+    them to the proxy for re-use in connecting to the origin server.
+
+    ## Privacy and security considerations
+
+    Every Gemini proxy is also a "man in the middle" between a user agent and an
+    origin server, and this has implications for privacy and security.  Gemini
+    proxies do NOT facilitate end-to-end TLS encryption between user agents and
+    origin servers (they are called proxies and not tunnels for this reason).
+    A Gemini proxy has the ability to arbitrarily modify or to permanently log
+    both responses and requests.
+
+    Gemini proxies are therefore intended to be trusted parties.  The expected
+    typical usage is for proxies to be either running locally on the same ma-
+    chine as the user agent, or on a different machine on the same local network
+    and operated by the same user.  Using a remote Gemini proxy operated by a
+    third party necessitates a high degree of trust in that third party. Careful
+    checking of TLS certificate fingerprints by both the user(s) and operator(s)
+    of a remote proxy can facilitate the sharing of a proxy within a small com-
+    munity with a high degree of internal trust.
+
+    In light of the above considerations:
+
+    * Clients MAY offer no support for configuring proxies
+    * Clients MAY only offer support for configuring proxies running on the same
+      machine or local network of the client
+    * Clients which support configuring proxies SHOULD clearly indicate to users
+      when a proxy is being used.
+
+    # Examples of Gemini requests
+
+    The examples below have two parties, the Server and Client.  Actions of each
+    are in square brackets '[]', literal text in quotes (but the quotes are NOT
+    included in the input) with a few terminals like 'CRLF' indicating the char-
+    acters code 13 and 10, 'mimetype' representing a MIME type per [RFC2045],
+    and 'content...' meaning the content requested.
+
+    This examle is a server requiring user input, which the client gathers, then
+    resubmits the request with the user input:
+
+    ```
+        Client: [opens connection]
+        Client: "gemini://example.net/search" CRLF
+        Server: "10 Please input a search term" CRLF
+        Server: [closes connection]
+        Client: [prompts user, gets input]
+        Client: [opens connection]
+        Client: "gemini://example.net/search?gemini%20search%20engines" CRLF
+        Server: "20 " mimetype CRLF content...
+        Server: [closes connection]
+    ```
+
+    The client is requesting some content, which in this example, is an
+    image file:
+
+    ```
+        Client: [opens connection]
+        Client: "gemini://example.net/image.jpg" CRLF
+        Server: "20 image/jpeg" CRLF <binary data of JPEG image>
+        Server: [closes connection]
+    ```
+
+    For this example the server is redirecting the client to the new
+    location of a resource:
+
+    ```
+        Client: [opens connection]
+        Client: "gemini://example.net/current" CRLF
+        Server: "30 /new" CRLF
+        Server: [closes connection]
+        Client: [opens connection]
+        Client: "gemini://example.net/new" CRLF
+        Server: "20 " mimetype CRLF content...
+        Server: [closes connection]
+    ```
+
+    Here we have a server requesting a client certificate, and the client
+    providing one on the subsequent request:
+
+    ```
+        Client: [opens connection, no client certificate sent]
+        Client: "gemini://example.net/protected/" CRLF
+        Server: "60 Certificate required to access this resource" CRLF
+        Server: [closes connection]
+        Client: [does application specific actions to get certificate]
+        Client: [opens connection, client certificate sent]
+        Client: "gemini://example.net/protected/" CRLF
+        Server: "20 " mimetype CRLF content...
+        Server: [closes connection]
+    ```
+
+    This example provides a minimal example of combining client certificates and
+    user input to implement an application which maintains per-user server-side
+    state and adds together two numbers.
+
+    ```
+        Client: [opens connection, no client certificate sent]
+        Client: "gemini://example.net/application/" CRLF
+        Server: "60 Certificate required to maintain server-side state" CRLF
+        Server: [closes connection]
+        Client: [does application specific actions to get certificate]
+        Client: [opens connection, client certificate sent]
+        Client: "gemini://example.net/application/" CRLF
+        Server: "10 Please enter a number between 0 and 9000" CRLF
+        Server: [closes connection]
+        Client: [prompts user, gets input]
+        Client: [opens connection, client certificate sent]
+        Client: "gemini://example.net/application/?42" CRLF
+        Server: [recognizes client certificate, stores value "42" in memory or
+                 on disk in association with certificate]
+        Server: "10 Please enter another number between 0 and 9000" CRLF
+        Server: [closes connection]
+        Client: [prompts user, gets input]
+        Client: [opens connection, client certificate sent]
+        Client: "gemini://example.net/application/?1923" CRLF
+        Server: [recognizes client certificate, retrieves stored value "42",
+                 adds it to received value "1923"]
+        Server: "20 text/plain" CRLF "42 plus 1923 equals 1965, have a nice
+                 day!"
+        Server: [closes connection]
+    ```
+
+    In this example, the server is sending a temporary failure with additional
+    text describing the error:
+
+    ```
+        Client: [opens connection]
+        Client: "gemini://example.net/data" CRLF
+        Server: "41 Undergoing maintanence at this time" CRLF
+        Server: [closes connection]
+    ```
+
+    And the final example, a permanent failure without any further explanation:
+
+    ```
+        Client: [opens connection]
+        Client: "gemini://example.net/data" CRLF
+        Server: "50" CRLF
+        Server: [closes connection]
+    ```
+
+    # Normative References
+
+    * [BCP14] Key words for use in RFCs to Indicate Requirement Levels
+    * [RFC2045] Multipurpose Internet Mail Extensions (MIME) Part One: Format of
+                Internet Message Bodies
+    * [RFC3987] Internationalized Resource Identifiers (IRIs)
+    * [STD63] UTF-8, a transformation format of ISO 10646
+    * [STD66] Uniform Resource Identifier (URI): Generic Syntax
+    * [STD68] Augmented BNF for Syntax Specifications: ABNF
+    * [STD80] ASCII format for network interchange
+
+    # Informative References
+
+    * [RFC1436] The Internet Gopher Protocol
+    * [RFC5246] The Transport Layer Security (TLS) Protocol Version 1.2
+    * [RFC6698] The DNS-Based Authentication of Named Entities (DANE),
+                Transport Layer Security (TLS) Protocol: TLSA
+    * [RFC7230] Hypertext Transfer Protocol
+    * [RFC8446] The Transport Layer Security (TLS) Protocol Version 1.3
+    * [STD7] Transmission Control Protocol
+
+LINKS
+    This document: gemini://geminiprotocol.net/docs/protocol-specification.gmi
+
+KEYWORDS
+    Gemini
+    Gemini Protocol
+    Project Gemini
+    Gemtext
+    Solderpunk
+    the small web

@@ -1,5 +1,5 @@
 ﻿TOPIC
-    about_psgemini
+    about_PSGemini
 
 SHORT DESCRIPTION
     Get resources by using the Gemini protocol.
@@ -102,11 +102,11 @@ SEE ALSO
 
     If you'd like to know more about Gemini, check out its unofficial official
     site at either:
-    => gemini://gemini.circumlunar.space, or
-    => https://gemini.circumlunar.space
+    => gemini://geminiprotocol.net or
+    => https://geminiprotocol.net
 
     The Gemini protocol specification is here:
-    => gemini://gemini.circumlunar.space/docs/specification.gmi
+    => gemini://geminiprotocol.net/docs/protocol-specification.gmi
 
     If you like Web/WWW/HTTP alternatives, why not check out my other module:
     => PSGopher: https://github.com/rhymeswithmogul/PSGopher
