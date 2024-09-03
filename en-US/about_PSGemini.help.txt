@@ -18,7 +18,7 @@ Certificate Trust
     The Gemini protocol uses certificates in a  trust on first use (TOFU) model.
     To keep track of this, PSGemini  saves found certificates to a file.   That
     file is saved at $env:PSGeminiTOFUPath. If that is not defined, it defaults
-    to `${env:HOME}/.PSGemini_known_hosts.csv`.
+    to `$HOME/.PSGemini_known_hosts.csv`.
     
     While  strongly discouraged,  if you've managed to find  my conceptual help,
     you might be the type who wants to mess with the trust store. You can do so
@@ -29,6 +29,11 @@ Certificate Trust
 
     Even more strongly discouraged:  you may open the CSV file in a text editor,
     Excel, LibreOffice Calc, or another app.
+
+    PSGemini v1.1.0 introduced a new file format, but for the truly adventurous,
+    you can use the cmdlet Convert-PSGeminiKnownHostsFileFormat to downgrade the
+    file or upgrade another.  The active file will be upgraded automatically as
+    needed when running Invoke-GeminiRequest.
 
 Aliases (or, Why Not `igr`?)
     You can use the aliases Invoke-GemRequest or igemr.  (Why not `igr`?  That
@@ -75,8 +80,8 @@ EXAMPLES
     result.
 
     EXAMPLE 2: DOWNLOAD RESOURCES
-    PS /Users/colin> Invoke-GeminiRequest gemini://colincogle.name/pgp.txt -OutFile pgp.txt
-    PS /Users/colin> Get-Item pgp.txt                            
+    PS ~> Invoke-GeminiRequest gemini://colincogle.name/pgp.txt -OutFile pgp.txt
+    PS ~> Get-Item pgp.txt                            
     
         Directory: /Users/colin
     
@@ -90,7 +95,7 @@ NOTE
     The Gemini specification uses a TOFU model for remembering certificates. To
     keep track of this, PSGemini saves found certificates to a file.  That file
     is saved at $env:PSGeminiTOFUPath.   If that is not defined by the user, it
-    defaults to `${env:HOME}/.PSGemini_known_hosts.csv`.
+    defaults to `$HOME/.PSGemini_known_hosts.csv`.
 
 TROUBLESHOOTING NOTE
     Client certificates have not been fully tested. If you encounter any issues,

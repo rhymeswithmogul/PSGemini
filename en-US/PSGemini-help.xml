@@ -19,7 +19,7 @@
         <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="0" aliases="none">
           <maml:name>HostName</maml:name>
           <maml:description>
-            <maml:para>The host name (i.e., Subject) field of the certificate, minus qualifiers such as "CN=".  The Gemini protocol does not check the SAN (subjectAltName) field.</maml:para>
+            <maml:para>The host name (i.e., Subject) field of the certificate, minus qualifiers such as "CN=".  The Gemini protocol does not check the SAN (subjectAltName) field, but both the hostname and port are used in the TOFU certificate validation scheme.</maml:para>
           </maml:description>
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
@@ -52,6 +52,18 @@
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>Port</maml:name>
+          <maml:description>
+            <maml:para>To connect to a Gemini capsule running on a non-standard port, specify the port number with this parameter.  The hostname and port are both used in the TOFU certificate validation scheme.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">UInt16</command:parameterValue>
+          <dev:type>
+            <maml:name>UInt16</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>1965</dev:defaultValue>
+        </command:parameter>
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
@@ -82,7 +94,7 @@
       <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="0" aliases="none">
         <maml:name>HostName</maml:name>
         <maml:description>
-          <maml:para>The host name (i.e., Subject) field of the certificate, minus qualifiers such as "CN=".  The Gemini protocol does not check the SAN (subjectAltName) field.</maml:para>
+          <maml:para>The host name (i.e., Subject) field of the certificate, minus qualifiers such as "CN=".  The Gemini protocol does not check the SAN (subjectAltName) field, but both the hostname and port are used in the TOFU certificate validation scheme.</maml:para>
         </maml:description>
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
@@ -90,6 +102,18 @@
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>Port</maml:name>
+        <maml:description>
+          <maml:para>To connect to a Gemini capsule running on a non-standard port, specify the port number with this parameter.  The hostname and port are both used in the TOFU certificate validation scheme.</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">UInt16</command:parameterValue>
+        <dev:type>
+          <maml:name>UInt16</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>1965</dev:defaultValue>
       </command:parameter>
     </command:parameters>
     <command:inputTypes>
@@ -121,7 +145,7 @@
     <command:examples>
       <command:example>
         <maml:title>-------------------------- Example 1 --------------------------</maml:title>
-        <dev:code>PS C:\&gt; Add-PSGeminiKnownCertificate -HostName gemini.circumlunar.space -Fingerprint 04A89008021E8F7AD7C73498D9147CC1D1122858FDB02DE0D50F82491F8CAF7CD525A2B410A20871A6AC7DB75AF7A1CE04C2F6628378108F8D6AB38EB8748D79BD -ExpirationDate (Get-Date 10/03/2025 09:50:37)</dev:code>
+        <dev:code>PS C:\&gt; Add-PSGeminiKnownCertificate -HostName geminiprotocol.net -Fingerprint 04A89008021E8F7AD7C73498D9147CC1D1122858FDB02DE0D50F82491F8CAF7CD525A2B410A20871A6AC7DB75AF7A1CE04C2F6628378108F8D6AB38EB8748D79BD -ExpirationDate (Get-Date 10/03/2025 09:50:37)</dev:code>
         <dev:remarks>
           <maml:para>Manually adds a certificate to the store.</maml:para>
         </dev:remarks>
@@ -152,6 +176,167 @@
   </command:command>
   <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
     <command:details>
+      <command:name>Convert-PSGeminiKnownHostsFileFormat</command:name>
+      <command:verb>Convert</command:verb>
+      <command:noun>PSGeminiKnownHostsFileFormat</command:noun>
+      <maml:description>
+        <maml:para>This cmdlet converts a PSGemini known hosts file between the new and old formats.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>This cmdlet converts the active PSGemini known hosts file (located at `$env:PSGeminiTOFUPath`) between the format used by PSGemini v1.1.0 and the format used by older versions.  This file is used to manage the trust-on-first-use certificate cache, and gets amended automatically as PSGemini's cmdlets are run.</maml:para>
+      <maml:para>There should be no need for anyone to use this cmdlet unless you need to use both the current version of PSGemini alongside an older one.</maml:para>
+    </maml:description>
+    <command:syntax>
+      <command:syntaxItem>
+        <maml:name>Convert-PSGeminiKnownHostsFileFormat</maml:name>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="0" aliases="none">
+          <maml:name>MinimumVersion</maml:name>
+          <maml:description>
+            <maml:para>Specify a version of the PSGemini module, and the file format will be upgraded or downgraded to the newest format that that version of PSGemini requires.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">Version</command:parameterValue>
+          <dev:type>
+            <maml:name>Version</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>Force</maml:name>
+          <maml:description>
+            <maml:para>If there is custom port information that would be lost in a version downgrade, the conversion fails to protect your data.  To bypass this warning, specify this parameter.</maml:para>
+          </maml:description>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
+        </command:parameter>
+      </command:syntaxItem>
+      <command:syntaxItem>
+        <maml:name>Convert-PSGeminiKnownHostsFileFormat</maml:name>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="0" aliases="none">
+          <maml:name>ModuleVersion</maml:name>
+          <maml:description>
+            <maml:para>Specify a version of the PSGemini module, and the file format will be upgraded or downgraded to the oldest format that that version of PSGemini requires.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">Version</command:parameterValue>
+          <dev:type>
+            <maml:name>Version</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>Force</maml:name>
+          <maml:description>
+            <maml:para>If there is custom port information that would be lost in a version downgrade, the conversion fails to protect your data.  To bypass this warning, specify this parameter.</maml:para>
+          </maml:description>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
+        </command:parameter>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>Force</maml:name>
+        <maml:description>
+          <maml:para>If there is custom port information that would be lost in a version downgrade, the conversion fails to protect your data.  To bypass this warning, specify this parameter.</maml:para>
+        </maml:description>
+        <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+        <dev:type>
+          <maml:name>SwitchParameter</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>False</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="0" aliases="none">
+        <maml:name>MinimumVersion</maml:name>
+        <maml:description>
+          <maml:para>Specify a version of the PSGemini module, and the file format will be upgraded or downgraded to the newest format that that version of PSGemini requires.</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">Version</command:parameterValue>
+        <dev:type>
+          <maml:name>Version</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="0" aliases="none">
+        <maml:name>ModuleVersion</maml:name>
+        <maml:description>
+          <maml:para>Specify a version of the PSGemini module, and the file format will be upgraded or downgraded to the oldest format that that version of PSGemini requires.</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">Version</command:parameterValue>
+        <dev:type>
+          <maml:name>Version</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+    </command:parameters>
+    <command:inputTypes>
+      <command:inputType>
+        <dev:type>
+          <maml:name>None</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para>This module does not accept pipeline input.</maml:para>
+        </maml:description>
+      </command:inputType>
+    </command:inputTypes>
+    <command:returnValues>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>System.Void</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para>This module does not generate output.  The file is converted without status messages.</maml:para>
+        </maml:description>
+      </command:returnValue>
+    </command:returnValues>
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para>There are two file formats, and the file format version matches the PSGemini module version.  File format v1.0.0 was the first version.  FIle format v1.1.0 added a Port parameter.</maml:para>
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples>
+      <command:example>
+        <maml:title>-------------------------- Example 1 --------------------------</maml:title>
+        <dev:code>PS C:\&gt; Convert-PSGeminiKnownHostsFileFormat</dev:code>
+        <dev:remarks>
+          <maml:para>Upgrades the TOFU cache file to the latest version (which is v1.1.0).</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- Example 2 --------------------------</maml:title>
+        <dev:code>PS C:\&gt; Convert-PSGeminiKnownHostsFileFormat -MinimumVersion v1.0.6</dev:code>
+        <dev:remarks>
+          <maml:para>Converts the TOFU cache file to the newest file format needed to support PSGemini v1.0.6 (that is, file format v1.0.0).</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+    <command:relatedLinks>
+      <maml:navigationLink>
+        <maml:linkText>Add-PSGeminiKnownCertificate</maml:linkText>
+        <maml:uri></maml:uri>
+      </maml:navigationLink>
+      <maml:navigationLink>
+        <maml:linkText>Get-PSGeminiKnownCertificate</maml:linkText>
+        <maml:uri></maml:uri>
+      </maml:navigationLink>
+      <maml:navigationLink>
+        <maml:linkText>Remove-PSGeminiKnownCertificate</maml:linkText>
+        <maml:uri></maml:uri>
+      </maml:navigationLink>
+    </command:relatedLinks>
+  </command:command>
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+    <command:details>
       <command:name>Get-PSGeminiKnownCertificate</command:name>
       <command:verb>Get</command:verb>
       <command:noun>PSGeminiKnownCertificate</command:noun>
@@ -169,7 +354,7 @@
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="0" aliases="none">
           <maml:name>HostName</maml:name>
           <maml:description>
-            <maml:para>{{ Fill HostName Description }}</maml:para>
+            <maml:para>Search for certificates matching this hostname.</maml:para>
           </maml:description>
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
@@ -178,13 +363,25 @@
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>Port</maml:name>
+          <maml:description>
+            <maml:para>If the Gemini capsule is listening on a non-standard port, you will need to specify this parameter in order to look it up.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">UInt16</command:parameterValue>
+          <dev:type>
+            <maml:name>UInt16</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>1965</dev:defaultValue>
+        </command:parameter>
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
       <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="0" aliases="none">
         <maml:name>HostName</maml:name>
         <maml:description>
-          <maml:para>{{ Fill HostName Description }}</maml:para>
+          <maml:para>Search for certificates matching this hostname.</maml:para>
         </maml:description>
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
@@ -192,6 +389,18 @@
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>Port</maml:name>
+        <maml:description>
+          <maml:para>If the Gemini capsule is listening on a non-standard port, you will need to specify this parameter in order to look it up.</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">UInt16</command:parameterValue>
+        <dev:type>
+          <maml:name>UInt16</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>1965</dev:defaultValue>
       </command:parameter>
     </command:parameters>
     <command:inputTypes>
@@ -456,7 +665,7 @@ ExpirationDate : 10/03/2025 09:50:37</dev:code>
     <command:examples>
       <command:example>
         <maml:title>-------------------------- Example 1 --------------------------</maml:title>
-        <dev:code>PS C:\&gt; Invoke-GeminiRequest gemini://gemini.circumlunar.space
+        <dev:code>PS C:\&gt; Invoke-GeminiRequest gemini://geminiprotocol.net/
 
 StatusCode        : 20
 StatusDescription : text/gemini
@@ -579,6 +788,18 @@ UnixMode   User             Group                 LastWriteTime           Size N
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>Port</maml:name>
+          <maml:description>
+            <maml:para>If you are selecting a certificate by hostname, you may specify this parameter to select a certificate with a non-standard port.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">UInt16</command:parameterValue>
+          <dev:type>
+            <maml:name>UInt16</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>1965</dev:defaultValue>
+        </command:parameter>
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="cf">
           <maml:name>Confirm</maml:name>
           <maml:description>
@@ -627,6 +848,18 @@ UnixMode   User             Group                 LastWriteTime           Size N
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>Port</maml:name>
+        <maml:description>
+          <maml:para>If you are selecting a certificate by hostname, you may specify this parameter to select a certificate with a non-standard port.</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">UInt16</command:parameterValue>
+        <dev:type>
+          <maml:name>UInt16</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>1965</dev:defaultValue>
       </command:parameter>
       <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="cf">
         <maml:name>Confirm</maml:name>

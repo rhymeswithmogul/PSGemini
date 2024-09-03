@@ -30,7 +30,8 @@ Function Invoke-GeminiRequest
 	Set-StrictMode -Version 3.0
 
 	# PowerShell doesn't recognize the gemini:// scheme.  Thus, we need to
-	# re-define our URI object with the port explicitly mentioned.
+	# re-define our URI object with the port explicitly mentioned -- if
+	# and only if the user does not specify a non-standard port.
 	If ($Uri.Port -eq -1)
 	{
 		$newURI = "gemini://" + $Uri.Host + ":1965" + $Uri.AbsolutePath + ($Uri.Query ? "?$($Uri.Query)" : '')
@@ -38,7 +39,7 @@ Function Invoke-GeminiRequest
 	}
 
 	#region Establish TCP connection.
-	Write-Verbose "Connecting to $($Uri.Host)"
+	Write-Verbose "Connecting to $($Uri.Host):$($Uri.Port)"
 	Try
 	{
 		$TcpSocket = [Net.Sockets.TcpClient]::new($Uri.Host, $Uri.Port)
@@ -67,7 +68,7 @@ Function Invoke-GeminiRequest
 			($null -ne $Certificate)
 		)
 		$TcpStream = $secureStream
-		Write-Verbose "Connected to $($Uri.Host) with $($TcpStream.SslProtocol)."
+		Write-Verbose "Connected to $($Uri.Host):$($Uri.Port) with $($TcpStream.SslProtocol)."
 		Write-Debug "Using $($TcpStream.SslProtocol) with ciphersuite $($TcpStream.NegotiatedCipherSuite)."
 	}
 	Catch
@@ -97,7 +98,7 @@ Function Invoke-GeminiRequest
 	{
 		$cert = $TcpStream.RemoteCertificate
 		Write-Debug "This certificate:    Fingerprint=$($cert.GetPublicKeyString()) Expires=$(Get-Date $cert.GetExpirationDateString())"
-		$trustedCert = Get-PSGeminiKnownCertificate -HostName $Uri.Host
+		$trustedCert = Get-PSGeminiKnownCertificate -HostName $Uri.Host -Port $Uri.Port
 	
 		If ($null -ne $trustedCert)
 		{
@@ -113,8 +114,8 @@ Function Invoke-GeminiRequest
 			ElseIf ($trustedCert.ExpirationDate -lt (Get-Date))
 			{
 				Remove-PSGeminiKnownCertificate -HostName $Uri.Host -Confirm:$false
-				Write-Warning "Subsequent visit. Memorizing new certificate for $($Uri.Host)"
-				Add-PSGeminiKnownCertificate -HostName $Uri.Host -Fingerprint $cert.GetPublicKeyString() -ExpirationDate (Get-Date $cert.GetExpirationDateString())
+				Write-Warning "Subsequent visit. Memorizing new certificate for $($Uri.Host):$($Uri.Port)."
+				Add-PSGeminiKnownCertificate -HostName $Uri.Host -Port $Uri.Port -Fingerprint $cert.GetPublicKeyString() -ExpirationDate (Get-Date $cert.GetExpirationDateString())
 			}
 	
 			# We've connected to the server before, but the old certificate should
@@ -129,8 +130,8 @@ Function Invoke-GeminiRequest
 		}
 		Else
 		{
-			Write-Warning "First visit. Memorizing new certificate for $($Uri.Host)"
-			Add-PSGeminiKnownCertificate -HostName $Uri.Host -Fingerprint $cert.GetPublicKeyString() -ExpirationDate (Get-Date $cert.GetExpirationDateString())
+			Write-Warning "First visit. Memorizing new certificate for $($Uri.Host):$($Uri.Port)."
+			Add-PSGeminiKnownCertificate -HostName $Uri.Host -Port $Uri.Port -Fingerprint $cert.GetPublicKeyString() -ExpirationDate (Get-Date $cert.GetExpirationDateString())
 		}	
 	}
 	#endregion SSL validation
@@ -601,23 +602,31 @@ Function Get-PSGeminiKnownCertificate
 	[OutputType([PSCustomObject[]])]
 	Param(
 		[AllowNull()]
-		[String] $HostName
+		[String] $HostName,
+
+		[ValidateRange(1,65535)]
+		[UInt16] $Port = 1965
 	)
 
-	Write-Debug "Looking for a certificate for $HostName."
+	Write-Debug "Looking for a certificate for ${HostName}:$Port."
 	$env:PSGeminiTOFUPath ??= (Join-Path -Path $HOME -ChildPath '.PSGemini_known_hosts.csv')
 
 	If (Test-Path -Path $env:PSGeminiTOFUPath -PathType Leaf)
 	{
 		Write-Debug "Found a certificate store at ${env:PSGeminiTOFUPath}."
 		$AllCerts = @()
-		Import-CSV -Path $env:PSGeminiTOFUPath | ForEach-Object	{
-			If ($null -eq $HostName  -or  $HostName -In @('', $_.HostName))
+		Import-CSV -Path $env:PSGeminiTOFUPath | ForEach-Object {
+			If (
+				($null -eq $HostName  -or  $HostName -In @('', $_.HostName)) -and
+				($Port -eq ${_}?.Port  -or  $null -eq ${_}?.Port -and $Port -eq 1965)
+			)
 			{
 				$NotAfter = [DateTime]::FromFileTimeUTC($_.ExpirationDate)
-				Write-Debug "In our store, we have a matching certificate for $($_.HostName), good until $NotAfter, fingerprint $($_.Fingerprint)."
+				$Port = ${_}?.Port ?? 1965
+				Write-Debug "In our store, we have a matching certificate for $($_.HostName):$Port, good until $NotAfter, fingerprint $($_.Fingerprint)."
 				$AllCerts += [PSCustomObject]@{
 					HostName = $_.HostName
+					Port = $Port
 					Fingerprint = $_.Fingerprint
 					ExpirationDate = $NotAfter
 				}
@@ -641,6 +650,9 @@ Function Add-PSGeminiKnownCertificate
 		[ValidateNotNullOrEmpty()]
 		[String] $HostName,
 
+		[ValidateRange(1,65535)]
+		[UInt16] $Port = 1965,
+
 		[Parameter(Mandatory, Position=1)]
 		[ValidateNotNullOrEmpty()]
 		[String] $Fingerprint,
@@ -651,15 +663,22 @@ Function Add-PSGeminiKnownCertificate
 		[DateTime] $ExpirationDate
 	)
 
-	Write-Verbose "Memorizing certificate for $HostName with fingerprint $Fingerprint and expiration date $ExpirationDate."
+	Write-Verbose "Memorizing certificate for ${HostName}:$Port with fingerprint $Fingerprint and expiration date $ExpirationDate."
 
 	$env:PSGeminiTOFUPath ??= (Join-Path -Path $HOME -ChildPath '.PSGemini_known_hosts.csv')
+
+	# Version 0.24.1 of the Gemini Protocol Specification requires clients like PSGemini to keep
+	# track of the port number.  We only started memorizing port numbers in version 1.1.0,
+	# so let's make sure our file is upgraded to support port numbers.
+	Convert-PSGeminiKnownHostsFileFormat -MinimumVersion 1.1.0 -ErrorAction Stop
+
 	Export-CSV -Path $env:PSGeminiTOFUPath -Append -Delimiter ',' -InputObject ([PSCustomObject]@{
 		HostName = $HostName
+		Port = $Port
 		Fingerprint = $Fingerprint
 		ExpirationDate = $ExpirationDate.ToFileTimeUTC()
 	})
-	#Add-Content -Path $env:PSGeminiTOFUPath -Value "$HostName,$Fingerprint,$($ExpirationDate.ToFileTimeUTC())"
+	#Add-Content -Path $env:PSGeminiTOFUPath -Value "${HostName}:$Port,$Fingerprint,$($ExpirationDate.ToFileTimeUTC())"
 }
 
 Function Remove-PSGeminiKnownCertificate
@@ -673,6 +692,10 @@ Function Remove-PSGeminiKnownCertificate
 		[Parameter(Mandatory, ParameterSetName='HostName')]
 		[ValidateNotNullOrEmpty()]
 		[String] $HostName,
+
+		[Parameter(ParameterSetName='HostName')]
+		[ValidateRange(1,65535)]
+		[UInt16] $Port = 1965,
 
 		[Parameter(Mandatory, ParameterSetName='Fingerprint')]
 		[ValidateNotNullOrEmpty()]
@@ -690,10 +713,10 @@ Function Remove-PSGeminiKnownCertificate
 	
 	If ($PSCmdlet.ParameterSetName -eq 'HostName')
 	{
-		$FoundCert = $AllCerts | Where-Object HostName -eq $HostName | Select-Object -First 1
+		$FoundCert = $AllCerts | Where-Object {$_.HostName -eq $HostName -and ($_.Port -eq $Port -or ($Port -eq 1965 -and $null -eq ${_}?.Port))} | Select-Object -First 1
 		If ($null -eq $FoundCert)
 		{
-			Write-Warning "No certificate for $HostName was found."
+			Write-Warning "No certificate for ${HostName}:$Port was found."
 		}
 	}
 	ElseIf ($PSCmdlet.ParameterSetName -eq 'Fingerprint')
@@ -707,10 +730,106 @@ Function Remove-PSGeminiKnownCertificate
 
 	If ($null -ne $FoundCert)
 	{
-		Write-Debug "Removing certificate for $($FoundCert.HostName):  expires=$([DateTime]::FromFileTimeUtc($FoundCert.ExpirationDate)), fingerprint=$($FoundCert.Fingerprint)"
+		Write-Debug "Removing certificate for $($FoundCert.HostName):$(${FoundCert}?.Port ?? 1965):  expires=$([DateTime]::FromFileTimeUtc($FoundCert.ExpirationDate)), fingerprint=$($FoundCert.Fingerprint)"
 		If ($PSCmdlet.ShouldProcess($FoundCert.Fingerprint, 'Remove from TOFU store'))
 		{
 			$AllCerts | Where-Object {$_ -ne $FoundCert} | Export-CSV -Path $env:PSGeminiTOFUPath -Force
 		}
 	}
+}
+
+Function Convert-PSGeminiKnownHostsFileFormat
+{
+	[CmdletBinding(SupportsShouldProcess)]
+	[Alias('Update-PSGeminiKnownHostsFileFormat')]
+	[OutputType([Void])]
+	Param(
+		[Parameter(ParameterSetName='SpecificVersion', Position=0)]
+		[Version] $ModuleVersion = '1.1.0',
+
+		[Parameter(ParameterSetName='MinimumVersion', Mandatory, Position=0)]
+		[Version] $MinimumVersion,
+
+		[Switch] $Force
+	)
+
+	$env:PSGeminiTOFUPath ??= (Join-Path -Path $HOME -ChildPath '.PSGemini_known_hosts.csv')
+	If (-Not (Test-Path -Path $env:PSGeminiTOFUPath -PathType Leaf)) {
+		Write-Verbose "The file $env:PSGeminiTOFUPath cannot be converted because it does not exist."
+		Return
+	}
+
+	$FileContents = Import-CSV -Path $env:PSGeminiTOFUPath -ErrorAction Stop
+	If ($null -eq $FileContents) {
+		Write-Verbose "The file $env:PSGeminiTOFUPath cannot be converted because it's empty."
+		Return
+	}
+
+	# The file format used in version 1.1.0 added port information, in order to comply with
+	# the Gemini Protocol Specification version 0.24.1.
+	If (($PSCmdlet.ParameterSetName -eq 'SpecificVersion' -and $ModuleVersion -ge '1.1.0') -or
+	    ($PSCmdlet.ParameterSetName -eq 'MinimumVersion' -and $MinimumVersion -ge '1.1.0'))
+	{
+		If ($FileContents[0].PSObject.Properties.Name -Contains 'Port')
+		{
+			Write-Verbose 'This known hosts file is already in version 1.1.0 format.'
+		}
+		Else
+		{
+			Write-Verbose 'This known hosts file is in the legacy version 1.0.0 format.  Upgrading it in-place to add port information.'
+			$NewFileContents = [PSCustomObject[]]@()
+			$FileContents | ForEach-Object {
+				Write-Debug "Adding port information for the capsule $($_.HostName) with fingerprint $($_.Fingerprint)."
+				$NewFileContents += [PSCustomObject]@{
+					'HostName' = $_.HostName
+					'Port' = $_.Port ?? 1965
+					'Fingerprint' = $_.Fingerprint
+					'ExpirationDate' = $_.ExpirationDate
+				}
+			}
+
+			If ($Force -or $PSCmdlet.ShouldProcess($env:PSGeminiTOFUPath, 'Convert this TOFU cache to the version 1.1.0 format'))
+			{
+				$NewFileContents | Export-CSV -Path $env:PSGeminiTOFUPath -NoTypeInformation -ErrorAction Continue
+			}
+		}
+	}
+
+	# I don't know why you would want to downgrade, but you can.
+	ElseIf (($PSCmdlet.ParameterSetName -eq 'SpecificVersion' -and $ModuleVersion -ge '1.0.0') -or
+	        ($PSCmdlet.ParameterSetName -eq 'MinimumVersion' -and $MinimumVersion -ge '1.0.0'))
+	{
+		If ($FileContents[0].PSObject.Properties.Name -NotContains 'Port')
+		{
+			Write-Verbose 'This known hosts file is already in version 1.0.0 format.'
+		}
+		Else
+		{
+			Write-Verbose 'This known hosts file is in a newer format.  Downgrading it in-place.'
+			$NewFileContents = [PSCustomObject[]]@()
+			$FileContents | ForEach-Object {
+				Write-Debug "Removing port information for the capsule $($_.HostName) with fingerprint $($_.Fingerprint)."
+				If ($null -ne ${_}.Port  -and  $_.Port -ne 1965  -and -not $Force) {
+					Throw "This file contains port information for $($_.Hostname):$($_.Port) that would be lost in a downgrade.  Please re-run this cmdlet with the -Force parameter."
+				}
+
+				$NewFileContents += [PSCustomObject]@{
+					'HostName' = $_.HostName
+					'Fingerprint' = $_.Fingerprint
+					'ExpirationDate' = $_.ExpirationDate
+				}
+			}
+
+			If ($Force -or $PSCmdlet.ShouldProcess($env:PSGeminiTOFUPath, 'Convert this TOFU cache to the version 1.1.0 format'))
+			{
+				$NewFileContents | Export-CSV -Path $env:PSGeminiTOFUPath -NoTypeInformation -ErrorAction Continue
+			}
+		}
+	}
+
+	Else {
+		Write-Error "You have specified an invalid file format version ($($ModuleVersion ?? $MinimumVersion))."
+	}
+
+	Return
 }

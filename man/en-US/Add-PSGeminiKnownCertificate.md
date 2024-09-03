@@ -13,8 +13,8 @@ Adds an SSL certificate to the PSGemini certificate store.
 ## SYNTAX
 
 ```
-Add-PSGeminiKnownCertificate [-HostName] <String> [-Fingerprint] <String> [-ExpirationDate] <DateTime>
- [<CommonParameters>]
+Add-PSGeminiKnownCertificate [-HostName] <String> [-Port <UInt16>] [-Fingerprint] <String> [-ExpirationDate] <DateTime>
+	[<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -26,7 +26,7 @@ This cmdlet is meant to be used internally by the PSGemini module.  Still, there
 
 ### Example 1
 ```powershell
-PS C:\> Add-PSGeminiKnownCertificate -HostName gemini.circumlunar.space -Fingerprint 04A89008021E8F7AD7C73498D9147CC1D1122858FDB02DE0D50F82491F8CAF7CD525A2B410A20871A6AC7DB75AF7A1CE04C2F6628378108F8D6AB38EB8748D79BD -ExpirationDate (Get-Date 10/03/2025 09:50:37)
+PS C:\> Add-PSGeminiKnownCertificate -HostName geminiprotocol.net -Fingerprint 04A89008021E8F7AD7C73498D9147CC1D1122858FDB02DE0D50F82491F8CAF7CD525A2B410A20871A6AC7DB75AF7A1CE04C2F6628378108F8D6AB38EB8748D79BD -ExpirationDate (Get-Date 10/03/2025 09:50:37)
 ```
 
 Manually adds a certificate to the store.
@@ -64,7 +64,7 @@ Accept wildcard characters: False
 ```
 
 ### -HostName
-The host name (i.e., Subject) field of the certificate, minus qualifiers such as "CN=".  The Gemini protocol does not check the SAN (subjectAltName) field.
+The host name (i.e., Subject) field of the certificate, minus qualifiers such as "CN=".  The Gemini protocol does not check the SAN (subjectAltName) field, but both the hostname and port are used in the TOFU certificate validation scheme.
 
 ```yaml
 Type: String
@@ -74,6 +74,20 @@ Aliases:
 Required: True
 Position: 0
 Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Port
+To connect to a Gemini capsule running on a non-standard port, specify the port number with this parameter.  The hostname and port are both used in the TOFU certificate validation scheme.
+```yaml
+Type: UInt16
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: 1965
 Accept pipeline input: False
 Accept wildcard characters: False
 ```

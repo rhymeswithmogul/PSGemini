@@ -13,7 +13,7 @@ Fetches one or more certificates from the PSGemini internal store.
 ## SYNTAX
 
 ```
-Get-PSGeminiKnownCertificate [[-HostName] <String>] [<CommonParameters>]
+Get-PSGeminiKnownCertificate [[-HostName] <String>] [-Port <UInt16>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -37,7 +37,7 @@ Fetches the trusted certificate for the named domain.  (Piped to `Format-List` f
 ## PARAMETERS
 
 ### -HostName
-{{ Fill HostName Description }}
+Search for certificates matching this hostname.
 
 ```yaml
 Type: String
@@ -47,6 +47,21 @@ Aliases:
 Required: False
 Position: 0
 Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Port
+If the Gemini capsule is listening on a non-standard port, you will need to specify this parameter in order to look it up.
+
+```yaml
+Type: UInt16
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: 1965
 Accept pipeline input: False
 Accept wildcard characters: False
 ```

@@ -14,12 +14,14 @@ Removes a certificate from PSGemini's internal store.
 
 ### HostName (Default)
 ```
-Remove-PSGeminiKnownCertificate -HostName <String> [-WhatIf] [-Confirm] [<CommonParameters>]
+Remove-PSGeminiKnownCertificate -HostName <String> [-Port <UInt16>] [-ProgressAction <ActionPreference>]
+ [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### Fingerprint
 ```
-Remove-PSGeminiKnownCertificate -Fingerprint <String> [-WhatIf] [-Confirm] [<CommonParameters>]
+Remove-PSGeminiKnownCertificate -Fingerprint <String> [-ProgressAction <ActionPreference>] [-WhatIf] [-Confirm]
+ [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -70,6 +72,36 @@ Parameter Sets: HostName
 Aliases:
 
 Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Port
+If you are selecting a certificate by hostname, you may specify this parameter to select a certificate with a non-standard port.
+
+```yaml
+Type: UInt16
+Parameter Sets: HostName
+Aliases:
+
+Required: False
+Position: Named
+Default value: 1965
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ProgressAction
+{{ Fill ProgressAction Description }}
+
+```yaml
+Type: ActionPreference
+Parameter Sets: (All)
+Aliases: proga
+
+Required: False
 Position: Named
 Default value: None
 Accept pipeline input: False

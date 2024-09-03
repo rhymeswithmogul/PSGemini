@@ -31,7 +31,7 @@ The `Invoke-GeminiRequest` cmdlet sends a Gemini request to a Gemini server.  It
 
 ### Example 1
 ```
-PS C:\> Invoke-GeminiRequest gemini://gemini.circumlunar.space
+PS C:\> Invoke-GeminiRequest gemini://geminiprotocol.net/
 
 StatusCode        : 20
 StatusDescription : text/gemini
@@ -181,6 +181,7 @@ When using the `-OutFile` parameter or parameter set, no output will be generate
 Client certificate checking has not been fully tested yet.
 
 ## RELATED LINKS
+
 [Get-PSGeminiKnownCertificate]()
 [Invoke-WebRequest]()
 [Invoke-GopherRequest]()
