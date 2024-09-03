@@ -4,7 +4,7 @@
 This version includes various little changes in order to comply with the evolving specification, which is now up to version 0.24.1:
 
 *  Per the section [*Clarification on error reporting*](https://geminiprotocol.net/news/2024_08_28.gmi#clarification-on-error-reporting), longer explanations of the error codes are now included in the returned error objects.
-
+*  Previous versions of this module would not parse a link line correctly if there was no spacing after the leading `=>`.  This was allowed the whole time, but [*Permit use of tabs in link lines and text lines*](https://geminiprotocol.net/news/2024_08_28.gmi#permit-use-of-tabs-in-link-lines-and-text-lines) made this a requirement.
 
 ## Version 1.0.6
 Included the Project Gemini Speculative Speculation as some extra reading material (`Get-Help about_ProjectGemini`).  The original has British English spellings, so why not?  Now we have a localization/localisation.

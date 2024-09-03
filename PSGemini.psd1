@@ -118,7 +118,7 @@ PrivateData = @{
 		# IconUri = ''
 
 		# ReleaseNotes of this module
-		ReleaseNotes = 'Various little updates to bring this into compliance with version 0.24.1 of the Gemini Protocol specification.'
+		ReleaseNotes = 'Various little bug fixes and updates to bring this into compliance with version 0.24.1 of the Gemini Protocol specification.'
 
 		# Prerelease string of this module
 		#Prerelease = ''

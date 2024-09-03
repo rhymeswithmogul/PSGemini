@@ -505,7 +505,11 @@ Function Invoke-GeminiRequest
 				ElseIf ($_.Length -gt 2  -and  $_.Substring(0,2) -eq '=>')
 				{
 					Write-Debug "Found a link: $_"
-					$foo, $href, $title = $_ -Split "\s+",3
+
+					# Split the link line into the URL and the title.
+					# Note that spacing after the "=>" is _optional_, per
+					# the Gemini Protocol specification version 0.24.1.
+					$href, $title = $_.Substring(2).Trim() -Split '\s+',2
 
 					# Because PowerShell doesn't recognize the gemini:// scheme,
 					# we need to go through the painstaking process of building
