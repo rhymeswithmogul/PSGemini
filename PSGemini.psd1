@@ -4,7 +4,7 @@
 RootModule = 'src/PSGemini.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.0.6'
+ModuleVersion = '1.1.0'
 
 # Supported PSEditions
 CompatiblePSEditions = @('Core', 'Desktop')
@@ -16,7 +16,7 @@ GUID = '5df7d4a1-ac51-457d-bc4c-6b923428be0e'
 Author = 'Colin Cogle'
 
 # Copyright statement for this module
-Copyright = '(c) 2022 Colin Cogle. All rights reserved.'
+Copyright = '(c) 2022, 2024 Colin Cogle. All rights reserved.'
 
 # Description of the functionality provided by this module
 Description = 'Fetches resources via the Gemini protocol.'
