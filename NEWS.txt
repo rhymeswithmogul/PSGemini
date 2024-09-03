@@ -1,3 +1,7 @@
+VERSION 1.1.0
+This module now complies with the Gemini Protocol Specification version 0.24.1
+thanks to a few bug fixes and improvements.
+
 VERSION 1.0.6
 The Project Gemini Speculative Specification can be read by typing:
 PS C:\>  Get-Help about_ProjectGemini

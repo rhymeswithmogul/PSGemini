@@ -91,13 +91,14 @@ FileList = @(
 	'en-US/about_PSGemini.help.txt',
 	'en-US/PSGemini-help.xml',
 	'src/PSGemini.psm1',
-	'AUTHORS',
+	'AUTHORS.txt',
 	'CHANGELOG.md',
-	'INSTALL',
-	'LICENSE',
-	'NEWS'
+	'INSTALL.md',
+	'LICENSE.md',
+	'NEWS.txt'
 	'PSGemini.psd1',
-	'README.md'
+	'README.md',
+	'SECURITY.md'
 )
 
 # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
